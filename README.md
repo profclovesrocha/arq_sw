@@ -1,2 +1,2 @@
-# arq_sw
-Disciplina: Arquitetura de Software
+# Seja Bem-vindo(a)!
+- Disciplina: Arquitetura de Software
