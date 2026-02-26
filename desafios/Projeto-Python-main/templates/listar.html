@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Usuários</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Lista de Usuários</h1>
+
+    <table>
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+        </tr>
+
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.nome }}</td>
+            <td>{{ usuario.email }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="/">Voltar</a>
+</div>
+
+</body>
+</html>
