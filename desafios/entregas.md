@@ -1,7 +1,8 @@
 # DATAS DAS ENTREGAS:
 - DESAFIO 1: 05/MAR/2026
-- DESAFIO 2: 19/MAR/2026 (da AULA 4)
-
+- DESAFIO 2: 19/MAR/2026 (da AULA 4) - 17/MAR TURMA NOITE
+- DESAFIO 3: 24/MAR/2026 (da AULA 5) - 26/MAR TURMA NOITE
+  
 # SUGESTÃO DE FERRAMENTAS COMPLEMENTAR
 - Selenium: https://www.selenium.dev/
 - ou outras para testes.
