@@ -4,6 +4,7 @@ import sqlite3
 app = Flask(__name__)
 app.secret_key = "123"
 
+#CRIAR BANCO DE DADOS
 def criar_banco():
     conn = sqlite3.connect("usuarios.db")
     cursor = conn.cursor()
@@ -26,8 +27,9 @@ def criar_banco():
     conn.commit()
     conn.close()
 
+#CRIAÇÃO DE ROTAS
 
-#route for cadastro
+#ROTA PARA CADASTRO
 @app.route("/", methods=["GET", "POST"])
 def cadastro():
     if request.method == "POST":
@@ -59,6 +61,7 @@ def cadastro():
     
     return render_template("cadastro.html")
 
+#ROTA PARA LOGIN
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -83,7 +86,7 @@ def login():
             session["usuario_id"] = usuario[0]
             session["tipo"] = usuario[4]
 
-            # redirecionamento
+            #REDIRECIONAMENTO
             if usuario[4] == "aluno":
                 return redirect("/home_aluno")
             else:
@@ -94,6 +97,7 @@ def login():
 
     return render_template("login.html")
 
+#ROTA PARA A TELA DO ALUNO
 @app.route("/home_aluno")
 def home_aluno():
 
@@ -117,6 +121,7 @@ def home_aluno():
 
     return render_template("home_aluno.html", pontos=pontos)
 
+#ROTA PARA ADICIONAR OS PONTOS DOS JOGOS
 @app.route("/add_pontos", methods=["POST"])
 def add_pontos():
 
@@ -141,6 +146,7 @@ def add_pontos():
 
     return "ok"
 
+#ROTA PARA SALVAR OS DADOS DOS ALUNOS 
 @app.route("/dados_alunos")
 def dados_alunos():
     conn = sqlite3.connect("usuarios.db")
@@ -153,10 +159,12 @@ def dados_alunos():
 
     return jsonify(alunos)
 
+#RORA PARA A TELA DO PROFESSOR
 @app.route("/home_professor")
 def home_professor():
     return render_template("home_professor.html")
 
+#ROTA PARA OS JOGOS
 @app.route("/jogo_frase")
 def jogo_frase():
     if "usuario_id" not in session:
@@ -173,7 +181,7 @@ def jogo_letras():
 def jogo_imagem():
     return render_template("jogo_imagem.html")
 
-
+#INICIALIZAÇÃO DA APLICAÇÃO
 if __name__ == "__main__":
     criar_banco()
     app.run(debug=True)
