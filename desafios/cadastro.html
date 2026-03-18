@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Usuário IMIP</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+
+<h2>Cadastro IMIP</h2>
+
+<form action="/" method="POST">
+
+    <label for="nome">Nome Completo</label><br>
+        <input type="text" id="nome" name="nome" required><br><br>
+
+    <label for="data">Data de Nascimento</label><br>
+        <input type="date" id="data" name="data" required><br><br>
+
+    <label for="email">Email</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+    <label for="senha">Criar senha</label><br> 
+        <input type="password" id="senha" name="senha" required><br><br>
+
+    <label for="tipo">Tipo de Usuário</label><br>
+
+        <select id="tipo" name="tipo">
+        <option value="aluno">Aluno</option>
+        <option value="professor">Professor</option>
+        </select>
+
+    <br><br>
+
+    <button type="submit">Cadastrar</button>
+
+</form>
+
+</body>
+
+</html>

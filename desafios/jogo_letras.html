@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Qual é a letra</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body> 
+
+<h1>Qual letra começa a palavra?</h1>
+
+<h2> 🍎 Maçã</h2>
+
+    <button onclick="resposta('A')">A</button>
+    <button onclick="resposta('M')">M</button>
+    <button onclick="resposta('P')">P</button>
+
+<p id="resultado"></p>
+
+<script>
+
+function resposta(letra){
+
+    if(letra=="M"){
+
+        document.getElementById("resultado").innerHTML="Muito bem! 🎉"
+
+        fetch("/add_pontos", {
+  method: "POST",
+  credentials: "same-origin"
+})
+
+        setTimeout(() => {
+            window.location.href = "/home_aluno";
+        }, 1000);
+
+    }
+
+    else{
+
+        document.getElementById("resultado").innerHTML="Ops! tente novamente"
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
