@@ -1,4 +1,4 @@
-Documento Técnico – Arquitetura e Decisões de Projeto
+## Documento Técnico – Arquitetura e Decisões de Projeto
 ## 1. Diagrama Arquitetural
 O sistema desenvolvido adota uma arquitetura do tipo cliente-servidor, estruturada em três
 camadas principais: front-end, back-end e banco de dados. Essa organização permite a separação
