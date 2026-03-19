@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Professores{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Professores</h1>
+    <a class="btn btn-primary" href="/teachers/new">Registrar professor</a>
+  </div>
+  {% if teachers %}
+    <table class="table-alunos">
+      <thead><tr><th>Nome</th><th>Área</th><th>Contato</th></tr></thead>
+      <tbody>
+      {% for teacher in teachers %}
+        <tr>
+          <td>{{ teacher.nome }}</td>
+          <td>{{ teacher.area or '-' }}</td>
+          <td>{{ teacher.contato or '-' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">Nenhum professor registrado.</div>
+  {% endif %}
+{% endblock %}

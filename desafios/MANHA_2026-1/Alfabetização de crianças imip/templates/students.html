@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Alunos{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Alunos</h1>
+    <a class="btn btn-primary" href="/students/new">Registrar aluno</a>
+  </div>
+  {% if students %}
+    <table class="table-alunos">
+      <thead><tr><th>Nome</th><th>Idade</th><th>Turma</th><th>Internação</th></tr></thead>
+      <tbody>
+        {% for student in students %}
+          <tr>
+            <td>{{ student.nome }}</td>
+            <td>{{ student.idade or '-' }}</td>
+            <td>{{ student.turma or '-' }}</td>
+            <td>{{ student.internacao or '-' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">Nenhum aluno registrado.</div>
+  {% endif %}
+{% endblock %}

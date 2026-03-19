@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Painel de Planos - IMIP{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Planos Pedagógicos</h1>
+    <a class="btn-nav" href="/plans/new">Nova trilha</a>
+  </div>
+
+  {% if planos %}
+    <div class="row">
+      {% for plan in planos %}
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ plan.titulo }}</h5>
+              <h6 class="card-subtitle">Aluno: {{ plan['aluno_nome'] or 'não informado' }}</h6>
+              <p class="card-subtitle"><strong>Metas:</strong> {{ plan.metas }}</p>
+              <p class="card-subtitle"><strong>Emocional:</strong> {{ plan.estado_emocional or 'estável' }}</p>
+              <div class="action">
+                  <a href="/plans/{{ plan.id }}" class="btn btn-primary ">Abrir</a>
+                  <form method="post" action="/plans/{{ plan.id }}/delete" class="d-inline">
+                    <button type="submit" class="btn btn-delete">Excluir</button>
+                  </form>
+              </div>
+             
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">Nenhum plano criado ainda. Crie um novo para começar.</div>
+  {% endif %}
+{% endblock %}

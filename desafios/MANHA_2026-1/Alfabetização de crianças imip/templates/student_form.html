@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Novo Aluno{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Novo Aluno</h1>
+  </div>
+  <div class="form-aluno">
+      <form method="post" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nome</label><input class="form-aluno" name="nome" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Idade</label><input class="form-aluno" name="idade" type="number">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Turma</label><input class="form-aluno" name="turma">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Internação / condição</label><textarea class="form-aluno" name="internacao"></textarea>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary">Salvar aluno</button> <a class="btn btn-secondary" href="/students">Cancelar</a>
+        </div>
+  </form>
+  </div>
+  
+{% endblock %}

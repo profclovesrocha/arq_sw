@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Criar Trilha Pedagógica</title>
+  <style>body{font-family:Arial,sans-serif;margin:2rem;}label{display:block;margin:.5rem 0 0.2rem;}input,textarea,select{width:100%;padding:.5rem;margin-bottom:.6rem;border:1px solid #ccc;border-radius:4px;} .btn{padding:.5rem 1rem;background:#1363DF;color:#fff;text-decoration:none;border-radius:4px;border:none;cursor:pointer;} .link{color:#1363DF;text-decoration:none;}</style>
+</head>
+<body>
+  <h1>Criar Trilha Pedagógica</h1>
+  <a class="link" href="/">« Voltar para Início</a>
+
+  <form method="post" action="/create">
+    <label for="patient_name">Nome do paciente</label>
+    <input type="text" name="patient_name" id="patient_name" required />
+
+    <label for="age">Idade</label>
+    <input type="text" name="age" id="age" placeholder="Ex: 8" />
+
+    <label for="condition">Condição clínica / internação</label>
+    <textarea name="condition" id="condition" rows="2" placeholder="Ex: pós-cirurgia, uso de insulina"></textarea>
+
+    <label for="emotional_state">Estado emocional</label>
+    <select name="emotional_state" id="emotional_state">
+      <option value="">Estável</option>
+      <option value="ansioso">Ansioso</option>
+      <option value="triste">Triste</option>
+      <option value="eufórico">Eufórico</option>
+      <option value="indiferente">Indiferente</option>
+    </select>
+
+    <label for="learning_goals">Objetivos de aprendizagem</label>
+    <textarea name="learning_goals" id="learning_goals" rows="3" required placeholder="Ex: aprender a ler pequenas palavras, reforçar escrita de nomes"></textarea>
+
+    <button class="btn" type="submit">Gerar plano</button>
+  </form>
+</body>
+</html>

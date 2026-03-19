@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Novo Professor{% endblock %}
+{% block content %}
+
+  <div class="header">
+      <h1>Novo Professor</h1>
+  </div>
+  
+  <form method="post" class="row g-3">
+    <div class="form-aluno">
+        <div class="col-md-6">
+          <label class="form-label">Nome</label><input class="form-aluno" name="nome" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Área</label><input class="form-aluno" name="area">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Contato</label><input class="form-aluno" name="contato">
+        </div>
+        <div class="col-12"><button class="btn btn-primary">Salvar professor</button> <a class="btn btn-secondary" href="/teachers">Cancelar</a></div>
+    </div>
+  
+  </form>
+{% endblock %}
