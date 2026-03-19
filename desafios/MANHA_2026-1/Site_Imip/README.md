@@ -15,6 +15,7 @@ dos alunos.
 A comunicação entre as camadas ocorre por meio de requisições HTTP, sendo os dados
 trafegados em formato JSON, permitindo atualização dinâmica das informações na interface do
 usuário.
+##
 2. Documento de Rationale
 As decisões técnicas adotadas no desenvolvimento deste projeto foram orientadas por critérios de
 simplicidade, eficiência e adequação ao contexto educacional.
@@ -31,6 +32,7 @@ dados, melhorando a experiência do usuário ao evitar recarregamentos desnecess
 Adicionalmente, o sistema contribui para a humanização do cuidado ao promover uma abordagem
 lúdica no processo de aprendizagem, incentivando o engajamento e permitindo o
 acompanhamento individual do desempenho dos alunos.
+##
 3. Análise de Trade-offs
 Durante o desenvolvimento do sistema, foram identificados diversos trade-offs entre segurança,
 desempenho e simplicidade de implementação.
