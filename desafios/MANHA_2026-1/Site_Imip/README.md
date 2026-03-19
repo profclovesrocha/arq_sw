@@ -1,4 +1,4 @@
-Documento Técnico – Arquitetura e Decisões de
+## Documento Técnico – Arquitetura e Decisões de
 Projeto
 1. Diagrama Arquitetural
 O sistema desenvolvido adota uma arquitetura do tipo cliente-servidor, estruturada em três
