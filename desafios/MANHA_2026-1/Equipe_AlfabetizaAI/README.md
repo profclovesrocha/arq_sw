@@ -27,6 +27,3 @@ Desafio de Arquitetura de software feitos em equipe.
 
 ##### Slide utilizado pela equipe :
 - https://view.genially.com/69b4c55249561c5da797c05e/presentation-alfabetiza
-
-##### Arquitetura utilizada no projeto:
-![Logo](./Desafio3_flask_e_IMIP_2/slides/diagrama.jpeg)
