@@ -11,3 +11,5 @@
 
 # SUGESTÃO - Desafios para Smart City 
 - https://docs.google.com/document/d/1C0nNNBLqCDSXJoIcvWlhaoC26HUpmbETfKGtKsIpeJs/edit?usp=sharing
+- StoryBee: Análise Completa do Gerador de Histórias Infantis por IA para o Brasil https://skywork.ai/skypage/pt/storybee-ai-story-generator/1988079527933714432
+- IA Generativa na Educação: Personalizando Histórias para Facilitar o Aprendizado de Leitura em Crianças https://sol.sbc.org.br/index.php/sbie/article/view/31364
