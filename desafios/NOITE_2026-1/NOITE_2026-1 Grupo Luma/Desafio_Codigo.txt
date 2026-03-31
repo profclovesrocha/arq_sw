@@ -1,0 +1,155 @@
+Desafio_Codigo
+
+1. Definir Entidades
+
+import uuid
+from datetime import datetime
+
+class Crianca:
+    def __init__(self, nome: str, data_nascimento: str, diagnostico: str):
+        # Dados sensíveis (serão anonimizados depois)
+        self.nome = nome
+        self.data_nascimento = data_nascimento
+        self.diagnostico = diagnostico
+        
+        # ID anonimizado (LGPD)
+        self.id_anonimo = str(uuid.uuid4())
+        
+        self.id = None
+
+
+class Professor:
+    def __init__(self, nome: str, email: str):
+        self.nome = nome
+        self.email = email
+        self.id = None
+
+
+class SessaoPedagogica:
+    def __init__(self, crianca: Crianca, professor: Professor):
+        self.crianca = crianca
+        self.professor = professor
+        self.estado_emocional = "neutro"
+        self.ativa = True
+        self.inicio = datetime.now()
+        self.id = None
+
+
+class TrilhaPedagogica:
+    def __init__(self, titulo: str, nivel: str):
+        self.titulo = titulo
+        self.nivel = nivel
+        self.id = None
+
+
+2. Criar Casos de Uso
+
+class CriarCrianca:
+    def __init__(self, repositorio_criancas):
+        self.repositorio_criancas = repositorio_criancas
+
+    def executar(self, nome: str, data_nascimento: str, diagnostico: str) -> Crianca:
+        crianca = Crianca(nome, data_nascimento, diagnostico)
+        
+        # Aqui ocorreria anonimização (Governança LGPD)
+        crianca.nome = None
+        crianca.data_nascimento = None
+        crianca.diagnostico = None
+        
+        self.repositorio_criancas.salvar(crianca)
+        return crianca
+
+
+class IniciarSessao:
+    def __init__(self, repositorio_sessoes):
+        self.repositorio_sessoes = repositorio_sessoes
+
+    def executar(self, crianca: Crianca, professor: Professor) -> SessaoPedagogica:
+        sessao = SessaoPedagogica(crianca, professor)
+        self.repositorio_sessoes.salvar(sessao)
+        return sessao
+
+
+class GerarNarrativaIA:
+    def __init__(self, fila_mensagens):
+        self.fila_mensagens = fila_mensagens
+
+    def executar(self, id_crianca: str):
+        # Envia para fila (RabbitMQ)
+        mensagem = {
+            "tipo": "gerar_narrativa",
+            "id_crianca": id_crianca
+        }
+        self.fila_mensagens.publicar(mensagem)
+
+3. Implementar Adaptadores
+
+# Adaptador de Banco (ex: SQLAlchemy)
+class RepositorioCriancasSQLAlchemy:
+    def salvar(self, crianca: Crianca):
+        # Persistência no banco
+        print("Salvando criança anonimizada no banco")
+        pass
+
+
+class RepositorioSessoesSQLAlchemy:
+    def salvar(self, sessao: SessaoPedagogica):
+        print("Salvando sessão pedagógica")
+        pass
+
+
+# Adaptador de fila (RabbitMQ)
+class FilaRabbitMQ:
+    def publicar(self, mensagem: dict):
+        print(f"Mensagem enviada para fila: {mensagem}")
+        pass
+
+
+Adaptador Web (Flask)
+
+from flask import Blueprint, request, jsonify
+
+bp = Blueprint('api', __name__)
+
+repositorio_criancas = RepositorioCriancasSQLAlchemy()
+repositorio_sessoes = RepositorioSessoesSQLAlchemy()
+fila = FilaRabbitMQ()
+
+
+@bp.route('/criancas', methods=['POST'])
+def criar_crianca():
+    dados = request.get_json()
+    
+    caso_de_uso = CriarCrianca(repositorio_criancas)
+    crianca = caso_de_uso.executar(
+        dados['nome'],
+        dados['data_nascimento'],
+        dados['diagnostico']
+    )
+    
+    return jsonify({
+        "id_anonimo": crianca.id_anonimo
+    })
+
+
+@bp.route('/sessao/iniciar', methods=['POST'])
+def iniciar_sessao():
+    dados = request.get_json()
+    
+    crianca = dados['crianca']
+    professor = dados['professor']
+    
+    caso_de_uso = IniciarSessao(repositorio_sessoes)
+    sessao = caso_de_uso.executar(crianca, professor)
+    
+    return jsonify({"status": "sessao iniciada"})
+
+
+@bp.route('/ia/narrativa', methods=['POST'])
+def gerar_narrativa():
+    dados = request.get_json()
+    
+    caso_de_uso = GerarNarrativaIA(fila)
+    caso_de_uso.executar(dados['id_crianca'])
+    
+    return jsonify({"status": "processamento assíncrono iniciado"})
