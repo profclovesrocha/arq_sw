@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>PulseRec — Encontre eventos. Viva a cultura.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --orange: #F04E00; --orange-light: #FF6820; --orange-mid: #FF7A35;
+      --orange-dark: #C43D00; --orange-pale: #FFF2EC; --orange-glow: rgba(240,78,0,0.14);
+      --white: #FFFFFF; --off-white: #FAF8F6; --dark: #0F0F0F; --dark2: #1C1C1C;
+      --gray: #737373; --gray-light: #F0EFED; --gray-mid: #D4D0CB;
+      --map-bg: #111827; --map-street: #1e2640; --map-accent: #252d47;
+      --font-display: 'Barlow Condensed', sans-serif; --font-body: 'Barlow', sans-serif;
+      --radius: 16px; --radius-sm: 10px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+    body { font-family:var(--font-body); background:var(--white); color:var(--dark); overflow-x:hidden; }
+
+    .page { display:none; min-height:100vh; }
+    .page.active { display:block; animation:fadeIn 0.28s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+
+    nav { position:fixed; top:0; left:0; right:0; z-index:999; display:flex; align-items:center; justify-content:space-between; padding:0 40px; height:64px; background:rgba(255,255,255,0.94); backdrop-filter:blur(18px); border-bottom:1px solid rgba(0,0,0,0.07); }
+    .nav-logo { display:flex; align-items:center; gap:9px; cursor:pointer; text-decoration:none; color:var(--dark); }
+    .nav-logo svg { width:30px; height:30px; }
+    .nav-brand { font-family:var(--font-display); font-size:1.35rem; font-weight:900; letter-spacing:-0.5px; text-transform:uppercase; }
+    .nav-brand span { color:var(--orange); }
+    .nav-links { display:flex; align-items:center; gap:32px; }
+    .nav-links a { font-size:0.88rem; font-weight:600; color:var(--dark); text-decoration:none; cursor:pointer; letter-spacing:0.2px; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--orange); }
+    .btn-nav { background:var(--dark); color:white; padding:9px 22px; border-radius:var(--radius-sm); font-family:var(--font-display); font-weight:700; font-size:0.9rem; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; border:none; transition:background 0.2s, transform 0.15s; }
+    .btn-nav:hover { background:var(--orange); transform:translateY(-1px); }
+
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; background:none; border:none; }
+    .hamburger span { width:22px; height:2px; background:var(--dark); border-radius:2px; transition:all 0.25s; }
+    .hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+    .mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; z-index:998; background:white; border-bottom:1px solid rgba(0,0,0,0.08); flex-direction:column; padding:20px 24px; box-shadow:0 8px 32px rgba(0,0,0,0.08); }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-size:1.1rem; font-weight:700; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.5px; color:var(--dark); text-decoration:none; padding:12px 0; border-bottom:1px solid var(--gray-light); cursor:pointer; }
+    .mobile-menu a:last-child { border:none; }
+    .mobile-menu a:hover { color:var(--orange); }
+    .mobile-menu .btn-mob { margin-top:12px; background:var(--dark); color:white; padding:14px; border-radius:var(--radius-sm); text-align:center; font-family:var(--font-display); font-weight:800; text-transform:uppercase; font-size:0.95rem; letter-spacing:0.5px; cursor:pointer; border:none; }
+
+    #page-landing { background:var(--white); }
+    .hero { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; align-items:center; padding:0 64px; gap:56px; padding-top:64px; }
+    .hero-text { max-width:560px; }
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:var(--orange-pale); border:1px solid rgba(240,78,0,0.18); border-radius:4px; padding:6px 14px; margin-bottom:24px; font-size:0.72rem; font-weight:700; color:var(--orange); letter-spacing:1.2px; text-transform:uppercase; font-family:var(--font-display); }
+    .pulse-dot { width:7px; height:7px; border-radius:50%; background:var(--orange); animation:pulseDot 1.8s ease-in-out infinite; }
+    @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.45;transform:scale(0.65);} }
+    .hero h1 { font-family:var(--font-display); font-size:clamp(3.2rem,5.5vw,5.2rem); font-weight:900; line-height:0.96; letter-spacing:-1px; margin-bottom:22px; text-transform:uppercase; }
+    .hero h1 .accent { color:var(--orange); }
+    .hero h1 .thin { font-weight:600; color:var(--gray); }
+    .hero-sub { font-size:1rem; color:var(--gray); line-height:1.7; margin-bottom:36px; font-weight:400; max-width:400px; }
+    .hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn-primary { background:var(--orange); color:white; padding:15px 32px; border-radius:var(--radius-sm); font-family:var(--font-display); font-weight:800; font-size:0.98rem; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; border:none; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px; }
+    .btn-primary:hover { background:var(--orange-dark); transform:translateY(-2px); box-shadow:0 8px 24px rgba(240,78,0,0.3); }
+    .btn-secondary { background:transparent; color:var(--dark); padding:15px 32px; border-radius:var(--radius-sm); font-family:var(--font-display); font-weight:700; font-size:0.98rem; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; border:1.5px solid rgba(0,0,0,0.15); transition:all 0.2s; }
+    .btn-secondary:hover { border-color:var(--orange); color:var(--orange); }
+    .hero-stats { display:flex; gap:32px; margin-top:40px; padding-top:28px; border-top:1px solid rgba(0,0,0,0.07); }
+    .stat-num { font-family:var(--font-display); font-size:1.9rem; font-weight:900; color:var(--dark); letter-spacing:-1px; line-height:1; }
+    .stat-label { font-size:0.75rem; color:var(--gray); font-weight:500; margin-top:3px; letter-spacing:0.2px; }
+
+    .hero-map-wrap { position:relative; height:560px; border-radius:24px; overflow:hidden; box-shadow:0 32px 80px rgba(0,0,0,0.16); }
+    .map-sim { width:100%; height:100%; background:var(--map-bg); position:relative; overflow:hidden; }
+    .map-grid { position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px); background-size:44px 44px; }
+    .map-roads { position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.07) 2px, transparent 2px), linear-gradient(38deg, rgba(255,255,255,0.04) 1.5px, transparent 1.5px), linear-gradient(-38deg, rgba(255,255,255,0.04) 1.5px, transparent 1.5px); background-size:110px 110px, 110px 110px, 190px 190px, 190px 190px; }
+    .heat-zone { position:absolute; border-radius:50%; background:radial-gradient(circle,var(--c1) 0%,var(--c2) 40%,transparent 70%); animation:heatPulse var(--dur,3s) ease-in-out infinite; pointer-events:none; }
+    @keyframes heatPulse { 0%,100%{transform:scale(1);opacity:var(--op,0.55);} 50%{transform:scale(1.2);opacity:calc(var(--op,0.55)*0.65);} }
+    .map-pin { position:absolute; display:flex; flex-direction:column; align-items:center; cursor:pointer; z-index:4; animation:pinFloat 3.2s ease-in-out infinite; }
+    @keyframes pinFloat { 0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);} }
+    .pin-dot { width:14px; height:14px; border-radius:50%; box-shadow:0 0 0 4px rgba(240,78,0,0.25), 0 4px 12px rgba(240,78,0,0.4); }
+    .map-bubble { background:rgba(255,255,255,0.97); border-radius:var(--radius-sm); padding:10px 14px; min-width:156px; margin-bottom:8px; box-shadow:0 8px 28px rgba(0,0,0,0.2); border-left:3px solid var(--orange); }
+    .bubble-title { font-family:var(--font-display); font-size:0.8rem; font-weight:800; color:var(--dark); text-transform:uppercase; letter-spacing:0.3px; }
+    .bubble-meta { font-size:0.7rem; color:var(--gray); margin-top:2px; }
+    .bubble-heat { font-size:0.68rem; font-weight:700; color:var(--orange); margin-top:5px; letter-spacing:0.4px; text-transform:uppercase; font-family:var(--font-display); }
+    .map-legend { position:absolute; bottom:16px; left:16px; background:rgba(15,15,15,0.88); border-radius:var(--radius-sm); padding:12px 16px; display:flex; flex-direction:column; gap:6px; backdrop-filter:blur(10px); }
+    .legend-title { font-size:0.62rem; font-weight:700; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; font-family:var(--font-display); margin-bottom:2px; }
+    .legend-item { display:flex; align-items:center; gap:8px; }
+    .legend-dot { width:9px; height:9px; border-radius:50%; }
+    .legend-label { font-size:0.68rem; color:rgba(255,255,255,0.75); font-weight:500; }
+    .map-badge { position:absolute; top:16px; left:16px; background:rgba(15,15,15,0.85); backdrop-filter:blur(10px); border-radius:50px; padding:7px 14px; display:flex; align-items:center; gap:8px; }
+    .map-badge svg { width:13px; height:13px; }
+    .map-badge span { font-size:0.73rem; font-weight:600; color:white; }
+    .map-counter { position:absolute; top:16px; right:16px; background:var(--orange); color:white; border-radius:50px; padding:7px 14px; font-size:0.7rem; font-weight:800; font-family:var(--font-display); letter-spacing:0.5px; text-transform:uppercase; animation:counterPulse 2.2s ease-in-out infinite; }
+    @keyframes counterPulse { 0%,100%{box-shadow:0 0 0 0 rgba(240,78,0,0.45);} 50%{box-shadow:0 0 0 10px rgba(240,78,0,0);} }
+
+    .features-strip { background:var(--off-white); padding:64px; border-top:1px solid rgba(0,0,0,0.06); }
+    .section-label { font-family:var(--font-display); font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
+    .section-title { font-family:var(--font-display); font-size:clamp(1.7rem,2.8vw,2.4rem); font-weight:900; letter-spacing:-0.5px; text-transform:uppercase; margin-bottom:40px; }
+    .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .feature-card { background:white; border-radius:var(--radius); padding:28px 24px; border:1px solid rgba(0,0,0,0.06); transition:transform 0.25s, box-shadow 0.25s; }
+    .feature-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(0,0,0,0.09); }
+    .feature-icon-wrap { width:44px; height:44px; border-radius:10px; background:var(--orange-pale); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+    .feature-icon-wrap svg { width:22px; height:22px; stroke:var(--orange); }
+    .feature-card h3 { font-family:var(--font-display); font-size:1.1rem; font-weight:800; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.2px; }
+    .feature-card p { font-size:0.87rem; color:var(--gray); line-height:1.65; }
+
+    #page-sobre { background:var(--white); padding-top:64px; }
+    .sobre-hero { background:var(--dark); padding:80px 64px; position:relative; overflow:hidden; }
+    .sobre-hero::before { content:''; position:absolute; top:-60px; right:-80px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(240,78,0,0.18),transparent 70%); pointer-events:none; }
+    .sobre-hero .section-label { color:var(--orange); }
+    .sobre-hero h1 { font-family:var(--font-display); font-size:clamp(2.8rem,4.5vw,4rem); font-weight:900; color:white; letter-spacing:-1px; text-transform:uppercase; line-height:0.96; position:relative; }
+    .sobre-hero p { font-size:1rem; color:rgba(255,255,255,0.6); max-width:480px; line-height:1.7; margin-top:16px; position:relative; }
+    .sobre-content { padding:72px 64px; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; }
+    .sobre-text h2 { font-family:var(--font-display); font-size:2rem; font-weight:900; letter-spacing:-0.5px; margin-bottom:20px; text-transform:uppercase; }
+    .sobre-text h2 span { color:var(--orange); }
+    .sobre-text p { font-size:0.95rem; color:var(--gray); line-height:1.8; margin-bottom:16px; }
+    .sobre-values { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .value-item { background:var(--off-white); border-radius:var(--radius); padding:20px; border:1px solid rgba(0,0,0,0.06); }
+    .value-icon { width:36px; height:36px; border-radius:8px; background:white; display:flex; align-items:center; justify-content:center; margin-bottom:10px; border:1px solid rgba(0,0,0,0.07); }
+    .value-icon svg { width:18px; height:18px; stroke:var(--orange); }
+    .value-title { font-family:var(--font-display); font-weight:800; font-size:0.9rem; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.3px; }
+    .value-desc { font-size:0.8rem; color:var(--gray); line-height:1.55; }
+    .sobre-stats-bar { background:var(--dark); padding:48px 64px; display:flex; align-items:center; justify-content:center; gap:56px; }
+    .big-stat { text-align:center; }
+    .big-stat .n { font-family:var(--font-display); font-size:3rem; font-weight:900; color:white; line-height:1; }
+    .big-stat .n span { color:var(--orange); }
+    .big-stat .l { font-size:0.75rem; color:rgba(255,255,255,0.45); font-weight:500; margin-top:4px; letter-spacing:0.3px; text-transform:uppercase; font-family:var(--font-display); }
+    .stats-sep { width:1px; height:40px; background:rgba(255,255,255,0.1); }
+
+    #page-locais { background:var(--white); padding-top:64px; }
+    .locais-hero { padding:72px 64px 48px; }
+    .locais-hero h1 { font-family:var(--font-display); font-size:clamp(2.4rem,4vw,3.4rem); font-weight:900; letter-spacing:-1px; text-transform:uppercase; margin-bottom:10px; }
+    .locais-hero h1 span { color:var(--orange); }
+    .locais-hero p { font-size:1rem; color:var(--gray); }
+    .locais-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:0 64px 72px; }
+    .local-card { border-radius:var(--radius); overflow:hidden; border:1px solid rgba(0,0,0,0.07); transition:transform 0.25s, box-shadow 0.25s; cursor:pointer; }
+    .local-card:hover { transform:translateY(-5px); box-shadow:0 20px 50px rgba(0,0,0,0.11); }
+    .local-banner { height:200px; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .local-banner-olinda { background:linear-gradient(145deg,#F04E00 0%,#FF7835 100%); }
+    .local-banner-recife { background:linear-gradient(145deg,#C43D00 0%,#F04E00 65%,#FF6820 100%); }
+    .local-city-bg { position:absolute; inset:0; background:repeating-linear-gradient( 45deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 1px, transparent 1px, transparent 28px ); }
+    .local-body { padding:26px; background:white; }
+    .local-name { font-family:var(--font-display); font-size:1.6rem; font-weight:900; text-transform:uppercase; margin-bottom:4px; letter-spacing:-0.5px; }
+    .local-state { font-size:0.7rem; color:var(--orange); font-weight:700; letter-spacing:1px; text-transform:uppercase; font-family:var(--font-display); }
+    .local-desc { font-size:0.87rem; color:var(--gray); line-height:1.65; margin-top:12px; margin-bottom:16px; }
+    .local-tags { display:flex; gap:7px; flex-wrap:wrap; }
+    .tag { background:var(--off-white); color:var(--dark); border-radius:4px; padding:5px 12px; font-size:0.72rem; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; font-family:var(--font-display); border:1px solid rgba(0,0,0,0.07); }
+    .local-events-count { display:flex; align-items:center; gap:8px; margin-top:16px; font-size:0.8rem; font-weight:700; color:var(--dark); font-family:var(--font-display); letter-spacing:0.2px; text-transform:uppercase; }
+    .events-dot { width:7px; height:7px; border-radius:50%; background:var(--orange); animation:pulseDot 1.5s infinite; }
+    .locais-coming { text-align:center; padding:8px 64px 64px; }
+    .coming-pill { display:inline-flex; align-items:center; gap:12px; background:var(--off-white); border:1px solid rgba(0,0,0,0.08); border-radius:var(--radius); padding:18px 28px; }
+    .coming-pill svg { width:18px; height:18px; stroke:var(--orange); }
+    .coming-title { font-family:var(--font-display); font-weight:800; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.3px; }
+    .coming-sub { font-size:0.78rem; color:var(--gray); margin-top:2px; }
+
+    #page-categorias { background:var(--white); padding-top:64px; }
+    .cat-hero { padding:72px 64px 40px; }
+    .cat-hero h1 { font-family:var(--font-display); font-size:clamp(2.4rem,4vw,3.4rem); font-weight:900; letter-spacing:-1px; text-transform:uppercase; margin-bottom:10px; }
+    .cat-hero h1 span { color:var(--orange); }
+    .cat-hero p { font-size:1rem; color:var(--gray); max-width:480px; line-height:1.6; }
+    .cat-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; padding:0 64px 64px; }
+    .cat-card { border-radius:var(--radius); padding:28px 16px; text-align:center; cursor:pointer; transition:transform 0.25s, box-shadow 0.25s; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1); }
+    .cat-card:hover { transform:translateY(-5px); box-shadow:0 20px 40px rgba(240,78,0,0.22); }
+    .cat-card .cat-icon { margin-bottom:12px; display:flex; align-items:center; justify-content:center; }
+    .cat-card .cat-icon svg { width:28px; height:28px; stroke:rgba(255,255,255,0.9); }
+    .cat-card .cat-name { font-family:var(--font-display); font-weight:900; font-size:0.95rem; color:white; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.3px; }
+    .cat-card .cat-count { font-size:0.72rem; color:rgba(255,255,255,0.6); font-weight:500; }
+    .c1 { background:linear-gradient(145deg,#F04E00,#FF7835); }
+    .c2 { background:linear-gradient(145deg,#C43D00,#F04E00); }
+    .c3 { background:linear-gradient(145deg,#FF6820,#FF9650); }
+    .c4 { background:linear-gradient(145deg,#A83300,#C43D00); }
+    .c5 { background:linear-gradient(145deg,#E04500,#F04E00); }
+    .cat-events { padding:0 64px 72px; }
+    .cat-events h2 { font-family:var(--font-display); font-size:1.6rem; font-weight:900; letter-spacing:-0.3px; text-transform:uppercase; margin-bottom:24px; }
+    .events-list { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .event-card { border-radius:var(--radius); border:1px solid rgba(0,0,0,0.07); overflow:hidden; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer; }
+    .event-card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.09); }
+    .event-img { height:110px; display:flex; align-items:center; justify-content:center; }
+    .event-img svg { width:36px; height:36px; stroke:rgba(255,255,255,0.8); }
+    .event-body { padding:16px; }
+    .event-cat { font-family:var(--font-display); font-size:0.68rem; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:6px; }
+    .event-title { font-family:var(--font-display); font-size:1rem; font-weight:800; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.2px; }
+    .event-meta { font-size:0.78rem; color:var(--gray); line-height:1.5; }
+    .event-heat { display:flex; align-items:center; gap:6px; margin-top:10px; font-size:0.75rem; font-weight:700; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.3px; }
+    .heat-indicator { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .heat-hot-dot { background:var(--orange); box-shadow:0 0 6px rgba(240,78,0,0.5); }
+    .heat-warm-dot { background:#FF9A50; }
+    .heat-cool-dot { background:var(--gray-mid); }
+
+    #page-login { background:var(--white); padding-top:64px; min-height:100vh; display:flex; align-items:stretch; justify-content:center; }
+    .login-wrap { display:grid; grid-template-columns:1fr 1fr; width:100%; }
+    .login-visual { background:var(--dark); padding:64px; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end; position:relative; overflow:hidden; }
+    .login-visual::before { content:''; position:absolute; top:-80px; right:-80px; width:380px; height:380px; border-radius:50%; background:radial-gradient(circle,rgba(240,78,0,0.22),transparent 70%); }
+    .login-visual::after { content:''; position:absolute; bottom:-60px; left:-60px; width:280px; height:280px; border-radius:50%; background:radial-gradient(circle,rgba(240,78,0,0.1),transparent 70%); }
+    .login-visual h2 { font-family:var(--font-display); font-size:3rem; font-weight:900; color:white; letter-spacing:-1px; line-height:0.96; margin-top:24px; text-transform:uppercase; position:relative; z-index:2; }
+    .login-visual h2 span { color:var(--orange); }
+    .login-visual p { color:rgba(255,255,255,0.55); margin-top:14px; font-size:0.95rem; line-height:1.65; position:relative; z-index:2; max-width:320px; }
+    .login-form-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 80px; background:white; }
+    .login-logo { display:flex; align-items:center; gap:9px; margin-bottom:36px; }
+    .login-logo svg { width:28px; height:28px; }
+    .login-logo .brand-txt { font-family:var(--font-display); font-size:1.35rem; font-weight:900; text-transform:uppercase; }
+    .login-logo .brand-txt span { color:var(--orange); }
+    .tab-switch { display:flex; background:var(--gray-light); border-radius:var(--radius-sm); padding:4px; margin-bottom:28px; width:100%; }
+    .tab-btn { flex:1; padding:10px; border:none; background:transparent; border-radius:8px; font-family:var(--font-display); font-weight:800; font-size:0.88rem; cursor:pointer; transition:all 0.2s; color:var(--gray); text-transform:uppercase; letter-spacing:0.3px; }
+    .tab-btn.active { background:white; color:var(--dark); box-shadow:0 2px 8px rgba(0,0,0,0.09); }
+    .form-group { width:100%; margin-bottom:16px; }
+    .form-label { font-family:var(--font-display); font-size:0.78rem; font-weight:700; color:var(--dark); margin-bottom:7px; display:block; text-transform:uppercase; letter-spacing:0.4px; }
+    .form-input { width:100%; padding:13px 16px; border:1.5px solid rgba(0,0,0,0.1); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:0.95rem; color:var(--dark); background:white; transition:border-color 0.2s, box-shadow 0.2s; outline:none; }
+    .form-input:focus { border-color:var(--orange); box-shadow:0 0 0 4px rgba(240,78,0,0.09); }
+    .btn-login { width:100%; padding:15px; background:var(--orange); color:white; border:none; border-radius:var(--radius-sm); font-family:var(--font-display); font-weight:900; font-size:1rem; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; margin-top:8px; transition:all 0.2s; }
+    .btn-login:hover { background:var(--orange-dark); transform:translateY(-1px); box-shadow:0 8px 24px rgba(240,78,0,0.28); }
+    .form-helper { font-size:0.8rem; color:var(--gray); text-align:center; margin-top:16px; }
+    .form-helper a { color:var(--orange); text-decoration:none; font-weight:700; cursor:pointer; }
+
+    #page-dashboard { background:var(--off-white); padding-top:64px; }
+    .dash-layout { display:grid; grid-template-columns:1fr 360px; height:calc(100vh - 64px); }
+    .dash-map-wrap { position:relative; }
+    #dash-map { width:100%; height:100%; }
+    .map-top-bar { position:absolute; top:16px; left:50%; transform:translateX(-50%); background:white; border-radius:50px; padding:10px 20px; box-shadow:0 4px 20px rgba(0,0,0,0.14); display:flex; align-items:center; gap:12px; z-index:500; }
+    .search-fake { display:flex; align-items:center; gap:8px; font-size:0.87rem; color:var(--gray); cursor:pointer; font-weight:500; }
+    .live-badge { display:flex; align-items:center; gap:6px; font-family:var(--font-display); font-size:0.7rem; font-weight:800; color:var(--orange); text-transform:uppercase; letter-spacing:0.5px; }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:var(--orange); animation:pulseDot 1.4s ease-in-out infinite; }
+    .map-filter-chips { position:absolute; top:68px; left:16px; z-index:500; display:flex; gap:7px; flex-wrap:wrap; max-width:calc(100% - 32px); }
+    .chip { background:white; border-radius:50px; padding:7px 15px; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.3px; box-shadow:0 2px 8px rgba(0,0,0,0.1); transition:all 0.2s; border:1.5px solid transparent; }
+    .chip:hover, .chip.active { background:var(--orange); color:white; border-color:var(--orange); }
+    .leaflet-container { background:#111827 !important; }
+
+    .feed-panel { background:white; overflow-y:auto; border-left:1px solid rgba(0,0,0,0.07); display:flex; flex-direction:column; }
+    .feed-header { padding:18px 20px 16px; border-bottom:1px solid rgba(0,0,0,0.07); position:sticky; top:0; background:white; z-index:10; }
+    .feed-header h3 { font-family:var(--font-display); font-size:1.1rem; font-weight:900; text-transform:uppercase; letter-spacing:0.3px; }
+    .feed-header p { font-size:0.76rem; color:var(--gray); margin-top:2px; }
+    .feed-post-box { padding:16px 18px; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .post-input-wrap { display:flex; gap:10px; align-items:flex-start; }
+    .post-avatar { width:34px; height:34px; border-radius:50%; background:var(--orange); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:900; color:white; font-family:var(--font-display); }
+    .post-input { flex:1; padding:10px 14px; border:1.5px solid rgba(0,0,0,0.09); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:0.87rem; resize:none; height:60px; outline:none; transition:border-color 0.2s; }
+    .post-input:focus { border-color:var(--orange); }
+    .post-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; margin-left:44px; }
+    .heat-selector { display:flex; gap:5px; }
+    .heat-btn { padding:5px 10px; border-radius:6px; border:1.5px solid rgba(0,0,0,0.09); font-size:0.72rem; font-weight:700; cursor:pointer; background:white; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.3px; transition:all 0.15s; color:var(--gray); }
+    .heat-btn:hover, .heat-btn.selected { background:var(--orange-pale); border-color:var(--orange); color:var(--orange); }
+    .btn-post { background:var(--orange); color:white; border:none; padding:8px 18px; border-radius:var(--radius-sm); font-family:var(--font-display); font-weight:800; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.3px; cursor:pointer; transition:background 0.2s; }
+    .btn-post:hover { background:var(--orange-dark); }
+    .feed-items { flex:1; overflow-y:auto; }
+    .feed-item { padding:16px 18px; border-bottom:1px solid rgba(0,0,0,0.05); transition:background 0.15s; }
+    .feed-item:hover { background:var(--off-white); }
+    .fi-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+    .fi-avatar { width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:900; color:white; font-family:var(--font-display); }
+    .fi-meta { flex:1; }
+    .fi-user { font-family:var(--font-display); font-weight:800; font-size:0.85rem; }
+    .fi-loc { font-size:0.7rem; color:var(--gray); margin-top:1px; }
+    .fi-loc span { color:var(--orange); font-weight:700; }
+    .fi-time { font-size:0.68rem; color:var(--gray); white-space:nowrap; }
+    .fi-content { font-size:0.84rem; color:var(--dark); line-height:1.55; margin-left:42px; }
+    .fi-footer { display:flex; align-items:center; gap:10px; margin-left:42px; margin-top:8px; }
+    .fi-heat-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:4px; font-family:var(--font-display); font-size:0.68rem; font-weight:800; letter-spacing:0.4px; text-transform:uppercase; }
+    .heat-hot { background:rgba(240,78,0,0.08); color:var(--orange); }
+    .heat-warm { background:rgba(255,154,80,0.1); color:#E07000; }
+    .heat-cool { background:rgba(107,114,128,0.08); color:var(--gray); }
+    .fi-react { font-size:0.75rem; color:var(--gray); cursor:pointer; display:flex; align-items:center; gap:4px; transition:color 0.15s; font-weight:600; }
+    .fi-react:hover { color:var(--orange); }
+
+    .site-footer { background:var(--dark); color:white; padding:60px 64px 36px; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr; gap:48px; margin-bottom:48px; }
+    .footer-brand { display:flex; align-items:center; gap:9px; margin-bottom:16px; }
+    .footer-brand svg { width:26px; height:26px; }
+    .footer-brand-name { font-family:var(--font-display); font-size:1.2rem; font-weight:900; text-transform:uppercase; }
+    .footer-brand-name span { color:var(--orange); }
+    .footer-desc { font-size:0.84rem; color:rgba(255,255,255,0.42); line-height:1.7; max-width:300px; }
+    .footer-col h4 { font-family:var(--font-display); font-size:0.72rem; font-weight:800; margin-bottom:16px; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; }
+    .footer-col a { display:block; font-size:0.84rem; color:rgba(255,255,255,0.65); text-decoration:none; margin-bottom:10px; cursor:pointer; transition:color 0.2s; font-weight:500; }
+    .footer-col a:hover { color:var(--orange); }
+    .footer-bottom { border-top:1px solid rgba(255,255,255,0.07); padding-top:24px; display:flex; justify-content:space-between; align-items:center; }
+    .footer-bottom p { font-size:0.76rem; color:rgba(255,255,255,0.28); }
+    .footer-bottom .accent { color:var(--orange); }
+
+    @media(max-width:1024px) {
+      nav { padding:0 20px; } .nav-links { display:none; } .hamburger { display:flex; }
+      .hero { grid-template-columns:1fr; padding:80px 24px 48px; gap:36px; }
+      .hero-map-wrap { height:360px; }
+      .features-strip { padding:48px 24px; } .features-grid { grid-template-columns:1fr; gap:14px; }
+      .sobre-hero { padding:60px 24px; } .sobre-content { grid-template-columns:1fr; padding:48px 24px; gap:36px; }
+      .sobre-values { grid-template-columns:1fr 1fr; } .sobre-stats-bar { flex-wrap:wrap; gap:28px; padding:40px 24px; }
+      .stats-sep { display:none; }
+      .locais-hero { padding:56px 24px 36px; } .locais-grid { grid-template-columns:1fr; padding:0 24px 48px; }
+      .locais-coming { padding:8px 24px 48px; }
+      .cat-hero { padding:56px 24px 32px; } .cat-grid { grid-template-columns:repeat(2,1fr); padding:0 24px 48px; gap:12px; }
+      .cat-events { padding:0 24px 48px; } .events-list { grid-template-columns:1fr; }
+      .login-wrap { grid-template-columns:1fr; } .login-visual { display:none; }
+      .login-form-wrap { padding:40px 28px; }
+      .dash-layout { grid-template-columns:1fr; height:auto; }
+      #dash-map { height:60vw; min-height:300px; max-height:480px; }
+      .feed-panel { height:auto; min-height:400px; }
+      .map-filter-chips { flex-wrap:nowrap; overflow-x:auto; max-width:calc(100% - 32px); padding-bottom:4px; }
+      .map-filter-chips::-webkit-scrollbar { display:none; }
+      .site-footer { padding:48px 24px 28px; } .footer-grid { grid-template-columns:1fr; gap:28px; }
+    }
+    @media(max-width:600px) {
+      .hero h1 { font-size:3rem; } .sobre-values { grid-template-columns:1fr; }
+      .cat-grid { grid-template-columns:1fr 1fr; } .hero-stats { gap:20px; }
+      .hero-btns { flex-direction:column; } .btn-primary, .btn-secondary { justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <a class="nav-logo" onclick="goTo('landing')">
+    <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 8 C50 8 72 28 68 50 C68 50 80 42 76 28 C76 28 92 44 88 64 C84 84 68 96 50 112 C32 96 16 84 12 64 C8 44 24 28 24 28 C20 42 32 50 32 50 C28 28 50 8 50 8Z" fill="#F04E00"/>
+      <path d="M50 45 C50 45 58 52 56 60 C60 56 64 50 60 44 C60 44 68 52 64 64 C60 76 54 82 50 90 C46 82 40 76 36 64 C32 52 40 44 40 44 C36 50 40 56 44 60 C42 52 50 45 50 45Z" fill="white" opacity="0.88"/>
+    </svg>
+    <span class="nav-brand">Pulse<span>Rec</span></span>
+  </a>
+  <div class="nav-links">
+    <a onclick="goTo('sobre')">Sobre nós</a>
+    <a onclick="goTo('locais')">Locais</a>
+    <a onclick="goTo('categorias')">Categorias</a>
+    <button class="btn-nav" onclick="goTo('login')">Entrar</button>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a onclick="goTo('sobre');closeMenu()">Sobre nós</a>
+  <a onclick="goTo('locais');closeMenu()">Locais</a>
+  <a onclick="goTo('categorias');closeMenu()">Categorias</a>
+  <button class="btn-mob" onclick="goTo('login');closeMenu()">Entrar →</button>
+</div>
+
+<div id="page-landing" class="page active">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-badge">
+        <div class="pulse-dot"></div>
+        Ao vivo · Pernambuco
+      </div>
+      <h1>
+        Encontre<br>
+        <span class="accent">eventos.</span><br>
+        <span class="thin">Viva a</span><br>
+        cultura.
+      </h1>
+      <p class="hero-sub">
+        Reconectando o público pernambucano à cultura local, vida noturna e interações sociais — do rolê gratuito ao mais nichado.
+      </p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="goTo('login')">
+          Vamos nessa
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-secondary" onclick="goTo('sobre')">Saiba mais</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">3.2k+</div>
+          <div class="stat-label">Eventos ativos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">12k</div>
+          <div class="stat-label">Usuários</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">47</div>
+          <div class="stat-label">Locais mapeados</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-map-wrap">
+      <div class="map-sim">
+        <div class="map-grid"></div>
+        <div class="map-roads"></div>
+
+        <div class="heat-zone" style="width:260px;height:260px;top:50px;left:80px;--c1:rgba(240,78,0,0.55);--c2:rgba(255,120,53,0.28);--dur:3.2s;--op:0.5;"></div>
+        <div class="heat-zone" style="width:180px;height:180px;top:160px;right:60px;--c1:rgba(240,78,0,0.45);--c2:rgba(255,120,53,0.22);--dur:2.8s;--op:0.42;"></div>
+        <div class="heat-zone" style="width:140px;height:140px;bottom:80px;left:200px;--c1:rgba(240,78,0,0.38);--c2:rgba(255,120,53,0.18);--dur:4s;--op:0.36;"></div>
+        <div class="heat-zone" style="width:100px;height:100px;bottom:140px;right:140px;--c1:rgba(240,78,0,0.3);--c2:rgba(255,120,53,0.14);--dur:3.5s;--op:0.3;"></div>
+
+        <div class="map-pin" style="top:60px;left:120px;animation-delay:0s;">
+          <div class="map-bubble">
+            <div class="bubble-title">Carnaval de Olinda</div>
+            <div class="bubble-meta">Largo do Amparo · Olinda</div>
+            <div class="bubble-heat">Bombando agora</div>
+          </div>
+          <div class="pin-dot" style="background:var(--orange);"></div>
+        </div>
+
+        <div class="map-pin" style="top:170px;right:80px;animation-delay:0.8s;">
+          <div class="map-bubble">
+            <div class="bubble-title">Show — Alceu Valença</div>
+            <div class="bubble-meta">Marco Zero · Recife</div>
+            <div class="bubble-heat">Agitado</div>
+          </div>
+          <div class="pin-dot" style="background:#FF7835;"></div>
+        </div>
+
+        <div class="map-pin" style="bottom:100px;left:230px;animation-delay:1.4s;">
+          <div class="pin-dot" style="background:#C43D00;"></div>
+        </div>
+
+        <div class="map-pin" style="bottom:160px;right:170px;animation-delay:0.4s;">
+          <div class="pin-dot" style="background:#FF6820;"></div>
+        </div>
+
+        <div class="map-legend">
+          <div class="legend-title">Temperatura</div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--orange);box-shadow:0 0 8px rgba(240,78,0,0.5);"></div>
+            <span class="legend-label">Bombando</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FF9650;"></div>
+            <span class="legend-label">Agitado</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:rgba(255,150,80,0.4);"></div>
+            <span class="legend-label">Movimentando</span>
+          </div>
+        </div>
+
+        <div class="map-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5" width="13" height="13">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+          <span>Recife, PE</span>
+        </div>
+        <div class="map-counter">24 eventos ao vivo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-strip">
+    <div class="section-label">Por que usar</div>
+    <div class="section-title">Por que o <span style="color:var(--orange)">PulseRec</span>?</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        </div>
+        <h3>Mapa de Calor</h3>
+        <p>Veja em tempo real onde a galera está concentrada e onde tá bombando agora. Chega sempre no momento certo.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        </div>
+        <h3>Feed Social</h3>
+        <p>Check-ins, relatos e reações da galera sobre os eventos. Saiba se tá trânsito, fila, cheio ou vazio antes de sair.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3>Atualização Contínua</h3>
+        <p>Integrado às principais fontes de eventos de Pernambuco. A programação sempre atualizada, sem precisar garimpar.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <svg viewBox="0 0 100 120" fill="none" width="26" height="32">
+            <path d="M50 8 C50 8 72 28 68 50 C68 50 80 42 76 28 C76 28 92 44 88 64 C84 84 68 96 50 112 C32 96 16 84 12 64 C8 44 24 28 24 28 C20 42 32 50 32 50 C28 28 50 8 50 8Z" fill="#F04E00"/>
+            <path d="M50 45 C50 45 58 52 56 60 C60 56 64 50 60 44 C60 44 68 52 64 64 C60 76 54 82 50 90 C46 82 40 76 36 64 C32 52 40 44 40 44 C36 50 40 56 44 60 C42 52 50 45 50 45Z" fill="white" opacity="0.85"/>
+          </svg>
+          <span class="footer-brand-name">Pulse<span>Rec</span></span>
+        </div>
+        <p class="footer-desc">Criado em 2026 por estudantes da UNINASSAU Olinda. Conectando Pernambuco à sua cena cultural.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Produto</h4>
+        <a onclick="goTo('sobre')">Sobre nós</a>
+        <a onclick="goTo('locais')">Locais</a>
+        <a onclick="goTo('categorias')">Categorias</a>
+        <a onclick="goTo('login')">Entrar</a>
+      </div>
+      <div class="footer-col">
+        <h4>Cidade</h4>
+        <a>Recife, PE</a>
+        <a>Olinda, PE</a>
+        <a>Caruaru, PE</a>
+        <a>Em breve...</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 PulseRec · UNINASSAU Olinda</p>
+      <p>Feito com <span class="accent">amor</span> em Pernambuco</p>
+    </div>
+  </footer>
+</div>
+
+<div id="page-sobre" class="page">
+  <div class="sobre-hero">
+    <div class="section-label">Quem somos</div>
+    <h1>Sobre o<br>PulseRec</h1>
+    <p>Uma plataforma nascida da vontade de dar ritmo à nossa cidade patrimônio.</p>
+  </div>
+  <div class="sobre-content">
+    <div class="sobre-text">
+      <h2>O que é o <span>PulseRec</span>?</h2>
+      <p>Criado em 2026, o PulseRec conecta pessoas a experiências reais na região metropolitana de Pernambuco. A proposta é simples: facilitar o encontro entre quem quer sair de casa e o que está acontecendo na cidade.</p>
+      <p>A plataforma organiza e destaca eventos de forma prática, com foco na cena local — do rolê gratuito ao mais nichado — ajudando você a descobrir opções perto, no momento certo.</p>
+      <p>Ao incentivar a ocupação dos espaços urbanos e a circulação de pessoas, contribuímos para uma vida noturna mais ativa, fortalecendo conexões e dando mais ritmo à nossa cidade patrimônio.</p>
+    </div>
+    <div class="sobre-values">
+      <div class="value-item">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="value-title">Cultura Local</div>
+        <div class="value-desc">Valorizamos o que Pernambuco tem de mais único — do frevo ao maracatu.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <div class="value-title">Proximidade</div>
+        <div class="value-desc">Eventos perto de você, no momento certo, sem precisar garimpar.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div class="value-title">Comunidade</div>
+        <div class="value-desc">A galera informa a galera. Feed social em tempo real.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="value-title">Acesso</div>
+        <div class="value-desc">Gratuito, inclusivo e pensado para todos os estilos e bolsos.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sobre-stats-bar">
+    <div class="big-stat"><div class="n">2026</div><div class="l">Fundação</div></div>
+    <div class="stats-sep"></div>
+    <div class="big-stat"><div class="n">3<span>.2k+</span></div><div class="l">Eventos listados</div></div>
+    <div class="stats-sep"></div>
+    <div class="big-stat"><div class="n">2</div><div class="l">Cidades ativas</div></div>
+    <div class="stats-sep"></div>
+    <div class="big-stat"><div class="n" style="font-size:1.7rem;">UNINASSAU</div><div class="l">Olinda, PE</div></div>
+  </div>
+</div>
+
+<div id="page-locais" class="page">
+  <div class="locais-hero">
+    <div class="section-label">Cidades</div>
+    <h1>Disponível <span>agora</span> em</h1>
+    <p>Explore os eventos que estão rolando na sua cidade.</p>
+  </div>
+  <div class="locais-grid">
+
+    <div class="local-card">
+      <div class="local-banner local-banner-olinda">
+        <div class="local-city-bg"></div>
+        <svg viewBox="0 0 120 100" width="180" height="150" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.9">
+          <rect x="45" y="55" width="30" height="35" fill="rgba(255,255,255,0.9)" rx="2"/>
+          <rect x="52" y="63" width="16" height="16" fill="rgba(240,78,0,0.45)" rx="1"/>
+          <rect x="52" y="30" width="16" height="28" fill="rgba(255,255,255,0.9)" rx="2"/>
+          <rect x="59" y="12" width="3" height="22" fill="rgba(255,255,255,0.9)" rx="1"/>
+          <rect x="53" y="20" width="14" height="3" fill="rgba(255,255,255,0.9)" rx="1"/>
+          <path d="M56 88 Q60 80 64 88" fill="rgba(240,78,0,0.45)" stroke="none"/>
+          <ellipse cx="20" cy="95" rx="30" ry="20" fill="rgba(255,255,255,0.1)"/>
+          <ellipse cx="100" cy="95" rx="30" ry="18" fill="rgba(255,255,255,0.1)"/>
+          <ellipse cx="95" cy="45" rx="16" ry="8" fill="rgba(255,255,255,0.2)"/>
+          <rect x="94" y="45" width="2" height="20" fill="rgba(255,255,255,0.2)" rx="1"/>
+        </svg>
+      </div>
+      <div class="local-body">
+        <div class="local-state">Pernambuco · PE</div>
+        <div class="local-name">Olinda</div>
+        <p class="local-desc">Patrimônio histórico e cultural da humanidade. Berço do frevo, do maracatu e das ladeiras que encantam o mundo. Do Carnaval mais democrático do Brasil às festas de rua do ano todo.</p>
+        <div class="local-tags">
+          <span class="tag">Carnaval</span>
+          <span class="tag">Patrimônio</span>
+          <span class="tag">Frevo</span>
+          <span class="tag">Arte de Rua</span>
+        </div>
+        <div class="local-events-count">
+          <div class="events-dot"></div>
+          18 eventos acontecendo agora
+        </div>
+      </div>
+    </div>
+
+    <div class="local-card">
+      <div class="local-banner local-banner-recife">
+        <div class="local-city-bg"></div>
+        <svg viewBox="0 0 140 100" width="200" height="150" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.9">
+          <rect x="0" y="72" width="140" height="5" fill="rgba(255,255,255,0.75)" rx="2"/>
+          <rect x="25" y="40" width="8" height="35" fill="rgba(255,255,255,0.9)" rx="2"/>
+          <rect x="107" y="40" width="8" height="35" fill="rgba(255,255,255,0.9)" rx="2"/>
+          <path d="M29 40 Q70 15 111 40" stroke="rgba(255,255,255,0.65)" stroke-width="1.5" fill="none"/>
+          <line x1="40" y1="37" x2="43" y2="72" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+          <line x1="55" y1="28" x2="58" y2="72" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+          <line x1="70" y1="22" x2="70" y2="72" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+          <line x1="85" y1="28" x2="82" y2="72" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+          <line x1="100" y1="37" x2="97" y2="72" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+          <path d="M0 78 Q35 82 70 78 Q105 74 140 78 L140 100 L0 100Z" fill="rgba(255,255,255,0.1)"/>
+          <circle cx="70" cy="62" r="5" fill="rgba(255,255,255,0.45)"/>
+          <rect x="69" y="38" width="2" height="18" fill="rgba(255,255,255,0.45)" rx="1"/>
+        </svg>
+      </div>
+      <div class="local-body">
+        <div class="local-state">Pernambuco · PE</div>
+        <div class="local-name">Recife</div>
+        <p class="local-desc">A Veneza brasileira que nunca para. Do Marco Zero ao Porto Digital, do Recife Antigo à boemia do Pina — a capital pernambucana pulsa de cultura, gastronomia e música o ano inteiro.</p>
+        <div class="local-tags">
+          <span class="tag">Marco Zero</span>
+          <span class="tag">Recife Antigo</span>
+          <span class="tag">Gastronomia</span>
+          <span class="tag">Shows</span>
+        </div>
+        <div class="local-events-count">
+          <div class="events-dot"></div>
+          31 eventos acontecendo agora
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="locais-coming">
+    <div class="coming-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <div style="text-align:left;">
+        <div class="coming-title">Mais cidades chegando</div>
+        <div class="coming-sub">Caruaru, Petrolina e interior de PE em breve.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-categorias" class="page">
+  <div class="cat-hero">
+    <div class="section-label">Explore</div>
+    <h1>Encontre sua <span>experiência</span></h1>
+    <p>Da maneira que quiser. Filtre pelo que te move.</p>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card c1">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3h18l-2 13H5L3 3z"/><path d="M3 3L2 1H1M8 21a1 1 0 100-2 1 1 0 000 2zM20 21a1 1 0 100-2 1 1 0 000 2z"/></svg>
+      </div>
+      <div class="cat-name">Gastronomia</div>
+      <div class="cat-count">142 eventos</div>
+    </div>
+    <div class="cat-card c2">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18V5l12-2v13M9 9l12-2M5 21a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z"/></svg>
+      </div>
+      <div class="cat-name">Rock</div>
+      <div class="cat-count">87 eventos</div>
+    </div>
+    <div class="cat-card c3">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      </div>
+      <div class="cat-name">Pop</div>
+      <div class="cat-count">203 eventos</div>
+    </div>
+    <div class="cat-card c4">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+      </div>
+      <div class="cat-name">Eletrônica</div>
+      <div class="cat-count">96 eventos</div>
+    </div>
+    <div class="cat-card c5">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18V5l12-2v13M9 9l12-2M5 21a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z"/></svg>
+      </div>
+      <div class="cat-name">MPB</div>
+      <div class="cat-count">124 eventos</div>
+    </div>
+  </div>
+
+  <div class="cat-events">
+    <h2>Em destaque agora</h2>
+    <div class="events-list">
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#F04E00,#FF7835);">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18V5l12-2v13M5 21a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z"/></svg>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Rock</div>
+          <div class="event-title">Festival Emergentes PE</div>
+          <div class="event-meta">Cais do Porto · Recife Antigo<br>Hoje, 20h</div>
+          <div class="event-heat">
+            <span class="heat-indicator heat-hot-dot"></span>
+            <span style="color:var(--orange)">Bombando</span>
+          </div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#C43D00,#F04E00);">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3h18l-2 13H5L3 3z"/></svg>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Gastronomia</div>
+          <div class="event-title">Feira Gastronômica de Olinda</div>
+          <div class="event-meta">Largo do Amparo · Olinda<br>Hoje, 17h às 23h</div>
+          <div class="event-heat">
+            <span class="heat-indicator heat-warm-dot"></span>
+            <span style="color:#E07000">Agitado</span>
+          </div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#FF6820,#FF9650);">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Eletrônica</div>
+          <div class="event-title">Underground Recife</div>
+          <div class="event-meta">Porto Digital · Recife<br>Hoje, 22h</div>
+          <div class="event-heat">
+            <span class="heat-indicator heat-warm-dot"></span>
+            <span style="color:#E07000">Aquecendo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-login" class="page">
+  <div class="login-wrap">
+    <div class="login-visual">
+      <svg viewBox="0 0 100 120" fill="none" width="64" height="76">
+        <path d="M50 8 C50 8 72 28 68 50 C68 50 80 42 76 28 C76 28 92 44 88 64 C84 84 68 96 50 112 C32 96 16 84 12 64 C8 44 24 28 24 28 C20 42 32 50 32 50 C28 28 50 8 50 8Z" fill="rgba(255,255,255,0.9)"/>
+        <path d="M50 45 C50 45 58 52 56 60 C60 56 64 50 60 44 C60 44 68 52 64 64 C60 76 54 82 50 90 C46 82 40 76 36 64 C32 52 40 44 40 44 C36 50 40 56 44 60 C42 52 50 45 50 45Z" fill="rgba(240,78,0,0.45)"/>
+      </svg>
+      <h2>A cultura de<br><span>PE</span> te espera.</h2>
+      <p>Crie sua conta e descubra o que está rolando perto de você agora mesmo.</p>
+    </div>
+
+    <div class="login-form-wrap">
+      <div class="login-logo">
+        <svg viewBox="0 0 100 120" fill="none" width="28" height="34"><path d="M50 8 C50 8 72 28 68 50 C68 50 80 42 76 28 C76 28 92 44 88 64 C84 84 68 96 50 112 C32 96 16 84 12 64 C8 44 24 28 24 28 C20 42 32 50 32 50 C28 28 50 8 50 8Z" fill="#F04E00"/><path d="M50 45 C50 45 58 52 56 60 C60 56 64 50 60 44 C60 44 68 52 64 64 C60 76 54 82 50 90 C46 82 40 76 36 64 C32 52 40 44 40 44 C36 50 40 56 44 60 C42 52 50 45 50 45Z" fill="white" opacity="0.85"/></svg>
+        <span class="brand-txt">Pulse<span>Rec</span></span>
+      </div>
+
+      <div class="tab-switch" id="login-tabs">
+        <button class="tab-btn active" onclick="switchTab('entrar')">Entrar</button>
+        <button class="tab-btn" onclick="switchTab('cadastro')">Criar conta</button>
+      </div>
+
+      <div id="form-entrar" style="width:100%">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" id="login-email" class="form-input" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" id="login-senha" class="form-input" placeholder="••••••••" />
+        </div>
+        <button class="btn-login" onclick="fazerLogin()">Entrar na plataforma →</button>
+      </div>
+
+      <div id="form-cadastro" style="width:100%;display:none;">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" id="reg-senha" class="form-input" placeholder="Mínimo 8 caracteres" />
+        </div>
+        <button class="btn-login" onclick="fazerCadastro()">Criar minha conta →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-dashboard" class="page">
+  <div class="dash-layout">
+    <div class="dash-map-wrap">
+      <div class="map-top-bar">
+        <div class="search-fake">Buscar eventos em Recife...</div>
+        <div class="live-badge"><div class="live-dot"></div> Ao vivo</div>
+      </div>
+      <div id="dash-map"></div>
+    </div>
+
+    <div class="feed-panel">
+      <div class="feed-header">
+        <h3>Feed da galera</h3>
+        <p>Check-ins e relatos em tempo real</p>
+      </div>
+
+      <div class="feed-post-box">
+        <div class="post-input-wrap">
+          <div class="post-avatar">EU</div>
+          <textarea id="post-conteudo" class="post-input" placeholder="Como tá o rolê aí?"></textarea>
+        </div>
+        <div class="post-actions">
+          <div class="heat-selector">
+            <button class="heat-btn selected" onclick="selectHeat(this)">Normal</button>
+            <button class="heat-btn" onclick="selectHeat(this)">Bombando</button>
+          </div>
+          <button class="btn-post" onclick="criarPost()">Postar</button>
+        </div>
+      </div>
+
+      <div class="feed-items" id="feed-list">
+        <div class="feed-item">
+          <div class="fi-top">
+            <div class="fi-avatar" style="background:var(--orange);">JV</div>
+            <div class="fi-meta">
+              <div class="fi-user">joao_recife</div>
+              <div class="fi-loc">em <span>Marco Zero</span> · Recife</div>
+            </div>
+            <div class="fi-time">agora</div>
+          </div>
+          <div class="fi-content">Galera, tá lotado aqui no show do Alceu! Chega cedo quem for, a fila tá grande mas tá valendo muito a pena.</div>
+          <div class="fi-footer">
+            <span class="fi-heat-badge heat-hot">Bombando</span>
+            <span class="fi-react" onclick="reactPost(this)">♥ 24</span>
+          </div>
+        </div>
+
+        <div class="feed-item">
+          <div class="fi-top">
+            <div class="fi-avatar" style="background:#C43D00;">BA</div>
+            <div class="fi-meta">
+              <div class="fi-user">bia_olinda</div>
+              <div class="fi-loc">em <span>Largo do Amparo</span> · Olinda</div>
+            </div>
+            <div class="fi-time">5 min</div>
+          </div>
+          <div class="fi-content">Frevo demais aqui! Galera toda animada no bloco. Trânsito pra subir a ladeira tá feio, melhor vir a pé pelo centro.</div>
+          <div class="fi-footer">
+            <span class="fi-heat-badge heat-hot">Bombando</span>
+            <span class="fi-react" onclick="reactPost(this)">♥ 41</span>
+          </div>
+        </div>
+
+        <div class="feed-item">
+          <div class="fi-top">
+            <div class="fi-avatar" style="background:#FF7835;">MK</div>
+            <div class="fi-meta">
+              <div class="fi-user">miguel.tech</div>
+              <div class="fi-loc">em <span>Porto Digital</span> · Recife</div>
+            </div>
+            <div class="fi-time">12 min</div>
+          </div>
+          <div class="fi-content">Evento do REC'n'Play começando agora, ainda tem vagas na entrada. Ar condicionado perfeito pra escapar do calor.</div>
+          <div class="fi-footer">
+            <span class="fi-heat-badge heat-warm">Agitado</span>
+            <span class="fi-react" onclick="reactPost(this)">♥ 8</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
