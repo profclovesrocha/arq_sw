@@ -4,6 +4,7 @@
 - DESAFIO 3: 26/MAR/2026 (da AULA 5) - 24/MAR TURMA NOITE
 - DESAFIO 4: 16/ABR/2026 (da AULA 6) - 14/ABR TURMA NOITE
 - DESAFIO FINAL: 09/JUNHO/2026 [NOITE] / 11/JUNHO/2026 [NOITE]
+- Link em destaque INSCRIÇÕES | FACEPE E SECTI EDITAL COMPET 14/2026: https://forms.gle/zD3ZLcyEcpTMdEfn7
 
 ### 🏛️ Seminário Final: Arquitetura do Sistema de Apoio à Decisão Pedagógica (IMIP)
 

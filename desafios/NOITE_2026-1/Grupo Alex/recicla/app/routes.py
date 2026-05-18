@@ -1,3 +1,4 @@
+# FALTA ADICIONAR MAIS ROTAS E USAR O docker -> https://docs.docker.com/desktop/setup/install/linux/
 from flask import Blueprint, render_template
 
 app_routes = Blueprint('app_routes', __name__)
