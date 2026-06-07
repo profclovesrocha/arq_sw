@@ -2,8 +2,8 @@
 
 GRUPO:
 
-Lucas José
-Pedro Henrique
+*   **Lucas José
+*   **Pedro Henrique
 
 
 # Exploradores do Espaço: Jornada do Conhecimento Estelar
