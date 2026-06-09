@@ -4,8 +4,6 @@ Equipe:
 
 Isaac Alves (01792818)
 
-Giovana Rodrigues (01866493)
-
 João Vitor Oliveira (01803637)
 
-Pedro Henrique Danel (01838266)
+Bárbara Menezes Nolé (01613473)

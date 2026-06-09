@@ -1,0 +1,24 @@
+body {
+  background: linear-gradient(
+    270deg,
+    rgba(54, 162, 111, 0.4) 0%,
+    rgba(40, 131, 181, 0.4) 100%
+  );
+}
+
+.blue {
+  color: #2581b2;
+}
+
+.green {
+  color: #35a56c;
+}
+
+.required {
+  color: #dc143c;
+}
+
+.main-view {
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,22 @@
+Porta:
+8080
+
+Criar ambiente virtual:
+python -m venv nome_ambiente
+python3 -m venv nome_ambiente
+
+Gerar depêndencias:
+pip freeze > requirements.txt
+
+Instalar depêndencias:
+pip install -r requirements.txt
+
+importar banco:
+localhost/phpmyadmin
+
+FRONTEND:
+Instalar depêndencias:
+npm i
+
+Buildar:
+npm run build

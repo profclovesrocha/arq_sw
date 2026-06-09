@@ -1,0 +1,141 @@
+.login-view {
+  display: flex;
+  align-items: center;
+  height: calc(100vh - 70px);
+  justify-content: space-between;
+  padding: 0 80px;
+}
+
+.login-container * {
+  font-family: "Roboto", sans-serif;
+}
+
+.login-container {
+  background-color: #eeeff3;
+  width: 450px;
+  flex: 0 1 auto;
+  min-height: 0;
+  border-radius: 8px;
+  padding: 3rem;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+}
+
+.login h3 {
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.login .invalid-credentials {
+  font-size: 0.8rem;
+  color: #ff2c2c;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+}
+
+label span {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+label input {
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid #282828;
+  margin-top: 3px;
+  padding: 5px;
+}
+
+label input:focus {
+  outline: 1px solid #2883b5;
+  border: none;
+}
+
+button {
+  background-color: #2883b5;
+  margin: 1.5rem 0 0.8rem 0;
+  height: 40px;
+  border-radius: 20px;
+  transition: 0.3s;
+  font-weight: bold;
+  color: #fff;
+  font-size: 1rem;
+  opacity: 0.9;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 1;
+}
+
+.forget-password {
+  color: #2883b5;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.forget-password:hover {
+  text-decoration: underline #2883b5;
+}
+
+.login-methods {
+  border-top: 1px solid #9a9a9a;
+  position: relative;
+}
+
+.login-methods .enter-with {
+  font-size: 0.8rem;
+  position: absolute;
+  background-color: #eeeff3;
+  padding: 0.3rem;
+  transform: translate(-50%, -50%);
+  top: -1px;
+  left: 50%;
+}
+
+.login-with-google {
+  cursor: pointer;
+  margin: 1.5rem auto;
+  background-color: #ededed;
+  border: 1px solid #282828;
+  border-radius: 8px;
+  width: 150px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.login-with-google img {
+  width: 30px;
+  height: 30px;
+  margin: 0 1.2rem;
+}
+
+.login-with-google span {
+  flex: 1;
+}
+
+.register-span {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+form {
+  display: flex;
+  height: 100%;
+}

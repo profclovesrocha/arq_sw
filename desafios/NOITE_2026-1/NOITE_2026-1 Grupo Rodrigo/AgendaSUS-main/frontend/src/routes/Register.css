@@ -1,0 +1,57 @@
+#register-container {
+  display: flex;
+  max-width: 450px;
+}
+
+.login-container {
+  padding: 2rem 3rem;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.title-container {
+  display: flex;
+  width: 100%;
+  margin-bottom: 4rem;
+}
+
+.title-container .back-icon {
+  cursor: pointer;
+}
+
+.title-container h3 {
+  margin: 0 auto;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+label input {
+  min-height: 35px;
+}
+
+#cpf {
+  width: 130px;
+  margin-right: 2.5rem;
+}
+
+#username {
+  min-width: 354px;
+}
+
+#email {
+  min-width: 354px;
+}
+
+#password {
+  min-width: 354px;
+}
+
+#finish-register {
+  width: 100%;
+}

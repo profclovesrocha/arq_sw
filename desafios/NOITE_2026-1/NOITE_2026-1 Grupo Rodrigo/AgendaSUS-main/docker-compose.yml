@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:8.0
+    container_name: agendasus_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_docker
+      MYSQL_DATABASE: agendasus_v1
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+
+    
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: agendasus_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=database
+      - DB_USER=root
+      - DB_PASSWORD=root_password_docker
+      - DB_NAME=agendasus_v1
+    depends_on:
+      - database
+
+volumes:
+  mysql_data:
