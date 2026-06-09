@@ -1,0 +1,33 @@
+.status-info {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.info {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.color {
+  width: 5px;
+  height: 5px;
+  border-radius: 100%;
+}
+
+.info-blue {
+  background-color: #2581b2;
+}
+
+.info-green {
+  background-color: #36a26f;
+}
+
+.info-red {
+  background-color: #dc143c;
+}
+
+.info > span {
+  font-size: 0.7rem;
+}

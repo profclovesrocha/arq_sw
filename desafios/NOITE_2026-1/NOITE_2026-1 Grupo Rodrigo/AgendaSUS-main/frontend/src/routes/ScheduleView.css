@@ -1,0 +1,129 @@
+#schedule-panel {
+  display: flex;
+  justify-content: center;
+  margin: 3rem auto;
+  flex-direction: column;
+  background-color: #fff;
+  padding: 3rem;
+  border-radius: 10px;
+  border: 2px #2581b2 solid;
+  -webkit-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.5);
+  max-width: 1000px;
+}
+
+#filter-form {
+  gap: 1rem;
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.filter-title {
+  color: #2581b2;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+#specialtie,
+#clinic {
+  margin-left: 1rem;
+}
+
+select {
+  padding: 10px 1rem;
+  border: 1px solid #282828;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+#date-input {
+  padding: 10px 1rem;
+  height: 40px;
+  border: 1px solid #282828;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-top: 0;
+}
+
+.find-schedules-btn {
+  padding: 0 1rem;
+  margin-left: auto;
+}
+
+.schedules-container {
+  border-top: 1px solid #a9a9a9;
+}
+
+.schedules-list {
+  margin-top: 1.4rem;
+  list-style: none;
+}
+
+.schedule {
+  width: 900px;
+  height: 75px;
+  border: 1px solid #2581b2;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.schedule:hover {
+  background-color: #f0f0f0;
+}
+
+.schedule > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor {
+  font-family: "Inter", sans-serif;
+  font-size: 1.3rem;
+  font-weight: bolder;
+  color: #005a82;
+}
+
+.specialtie {
+  font-weight: normal;
+  color: #2581b2;
+  font-size: 1rem;
+}
+
+.local,
+.clinic {
+  text-align: center;
+}
+
+.local {
+  color: #2581b2;
+  font-size: 1rem;
+}
+
+.clinic {
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+}
+
+.date-and-time-info {
+  align-items: center;
+}
+
+.start-time,
+.weekday,
+.date {
+  font-family: "Inter", sans-serif;
+}
+
+p {
+  text-align: center;
+}
+
+.appointment-response {
+  margin-bottom: 1rem;
+}

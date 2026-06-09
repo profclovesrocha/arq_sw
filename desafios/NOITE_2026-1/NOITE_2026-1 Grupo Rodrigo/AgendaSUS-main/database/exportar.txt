@@ -1,0 +1,1 @@
+sudo ./mysqldump -u root agendasus_v1 > /home/rodrigonunes/Documentos/estudos/AgendaSUS/backend/bd/agendasus_v1.sql
