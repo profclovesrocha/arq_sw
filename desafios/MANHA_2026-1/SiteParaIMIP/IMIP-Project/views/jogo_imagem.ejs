@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Adivinhe a palavra</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<h1>Adivinhe a palavra</h1>
+
+<div id="conteudo">
+    <p>Carregando pergunta...</p>
+</div>
+
+<p id="resultado"></p>
+
+<script>
+
+let respostaCorreta = '';
+
+async function carregarPergunta() {
+    const res = await fetch('/pergunta/imagem');
+    const dados = await res.json();
+
+    respostaCorreta = dados.resposta;
+
+    document.getElementById('conteudo').innerHTML = `
+        <div class="emoji">${dados.emoji}</div>
+        ${dados.opcoes.map(op => `<button onclick="resposta('${op}')">${op}</button>`).join('')}
+    `;
+}
+
+function resposta(palavra) {
+    if (palavra === respostaCorreta) {
+        document.getElementById('resultado').innerHTML = 'Acertou! 🎉';
+
+        fetch('/add_pontos', { method: 'POST', credentials: 'same-origin' });
+
+        setTimeout(() => {
+            window.location.href = '/home_aluno';
+        }, 1000);
+    } else {
+        document.getElementById('resultado').innerHTML = 'Tente novamente 😊';
+    }
+}
+
+carregarPergunta();
+
+</script>
+
+</body>
+</html>
