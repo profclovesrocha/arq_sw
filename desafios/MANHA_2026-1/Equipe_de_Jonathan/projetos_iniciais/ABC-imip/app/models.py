@@ -100,6 +100,16 @@ class Attempt(db.Model):
     # Nota do quiz
     score = db.Column(db.Float)
 
+    student = db.relationship(
+        "User",
+        backref="attempts"
+    )
+
+    quiz = db.relationship(
+        "Quiz",
+        backref="attempts"
+    )
+
 
 # =========================
 # RESPOSTAS
