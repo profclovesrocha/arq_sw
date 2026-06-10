@@ -9,7 +9,6 @@ from app.models import (
 )
 
 from app import db
-
 quiz_bp = Blueprint(
     "quiz",
     __name__,
@@ -22,7 +21,7 @@ quiz_bp = Blueprint(
 # GET /quizzes
 # =========================
 @quiz_bp.route("", methods=["GET"])
-@jwt_required()
+#@jwt_required()
 def get_quizzes():
 
     quizzes = Quiz.query.all()
@@ -44,7 +43,7 @@ def get_quizzes():
 # GET /quizzes/<id>
 # =========================
 @quiz_bp.route("/<int:quiz_id>", methods=["GET"])
-@jwt_required()
+#@jwt_required()
 def get_quiz(quiz_id):
 
     quiz = Quiz.query.get(quiz_id)
@@ -77,7 +76,7 @@ def get_quiz(quiz_id):
 # POST /quizzes/submit
 # =========================
 @quiz_bp.route("/submit", methods=["POST"])
-@jwt_required()
+#@jwt_required()
 def submit_quiz():
 
     try:
@@ -114,7 +113,7 @@ def submit_quiz():
 
         # Cria tentativa
         attempt = Attempt(
-            student_id=get_jwt_identity(),
+            student_id=1,
             quiz_id=quiz_id,
             score=0
         )
