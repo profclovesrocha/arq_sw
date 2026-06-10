@@ -1,0 +1,154 @@
+<div class="min-h-screen flex flex-col bg-[var(--color-background)]">
+
+  @if (!concluida()) {
+
+    <!-- ── Header da lição ── -->
+    <div class="flex items-center justify-between px-6 py-4 bg-white border-b border-[var(--color-border)] sticky top-0 z-10">
+      <h1 class="text-lg font-bold text-[var(--color-text-primary)] truncate pr-4">
+        {{ licao()?.titulo }}
+      </h1>
+      <button
+        (click)="onFechar()"
+        class="min-h-[48px] min-w-[48px] flex items-center justify-center rounded-full text-xl text-[var(--color-text-muted)] hover:bg-[var(--color-background)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] transition-colors flex-shrink-0"
+        aria-label="Fechar lição"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- ── Barra de progresso (dots) ── -->
+    <div
+      class="flex justify-center gap-2 px-6 py-3 bg-white border-b border-[var(--color-border)]"
+      role="progressbar"
+      [attr.aria-valuenow]="stepAtual() + 1"
+      [attr.aria-valuemax]="totalSteps()"
+      [attr.aria-label]="'Passo ' + (stepAtual() + 1) + ' de ' + totalSteps()"
+    >
+      @for (preenchido of dotsProgresso(); track $index) {
+        <div
+          class="w-3 h-3 rounded-full transition-all duration-300"
+          [class]="preenchido ? 'bg-[var(--color-imip-green)]' : 'bg-[var(--color-border)]'"
+        ></div>
+      }
+    </div>
+
+    <!-- ── Conteúdo do step ── -->
+    <div
+      class="flex-1 px-6 py-6 transition-opacity duration-200"
+      [class.opacity-0]="transitando()"
+    >
+      @if (stepCorrente()?.tipo === 'card-informativo') {
+        <div class="bg-white rounded-[var(--rounded-xl)] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.08)] max-w-lg mx-auto">
+          <h2 class="text-2xl font-bold text-[var(--color-text-primary)] mb-4">
+            {{ comoInformativo(stepCorrente()).titulo }}
+          </h2>
+          <p class="text-lg text-[var(--color-text-secondary)] leading-relaxed mb-6">
+            {{ comoInformativo(stepCorrente()).conteudo }}
+          </p>
+          <button
+            (click)="avancarStep()"
+            class="w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold text-lg hover:bg-[var(--color-imip-green-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] active:scale-[0.98] transition-all"
+          >
+            Próximo →
+          </button>
+        </div>
+      }
+
+      @if (stepCorrente()?.tipo === 'pergunta') {
+        <div class="max-w-lg mx-auto">
+          <app-opcao-multipla-escolha
+            [pergunta]="comoPergunta(stepCorrente())"
+            (acertou)="onAcertou()"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- ── Overlay de confirmação de saída ── -->
+    @if (mostrarConfirmacao()) {
+      <div
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialogo-titulo"
+      >
+        <div class="bg-white rounded-[var(--rounded-xl)] p-6 shadow-[0_8px_24px_rgba(0,0,0,0.15)] max-w-sm w-full">
+          <p id="dialogo-titulo" class="text-lg font-bold text-[var(--color-text-primary)] mb-2">
+            Tem certeza?
+          </p>
+          <p class="text-[var(--color-text-secondary)] mb-6">
+            Seu progresso nesta lição não será salvo.
+          </p>
+          <div class="flex flex-col gap-3">
+            <button
+              (click)="cancelarSaida()"
+              class="w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold hover:bg-[var(--color-imip-green-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] transition-colors"
+            >
+              Continuar lição
+            </button>
+            <button
+              (click)="confirmarSaida()"
+              class="w-full min-h-[48px] rounded-[var(--rounded-xl)] border-2 border-[var(--color-border)] text-[var(--color-text-secondary)] font-bold hover:bg-[var(--color-background)] focus:outline-none transition-colors"
+            >
+              Sair
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+  } @else {
+
+    <!-- ── Tela de conclusão ── -->
+    <div class="flex-1 flex items-center justify-center px-6 py-12">
+      <div
+        class="bg-white rounded-[var(--rounded-xl)] p-8 shadow-[0_8px_24px_rgba(0,0,0,0.15)] max-w-md w-full text-center animate-scale-bounce"
+      >
+        @if (foiPrimeiraVez()) {
+          <p class="text-[2.5rem] font-extrabold text-[var(--color-imip-green)] leading-tight mb-1">
+            Incrível!
+          </p>
+          <p class="text-xl font-bold text-[var(--color-text-primary)] mb-6">
+            Você terminou! 🎉
+          </p>
+
+          <!-- Estrelas -->
+          <div class="flex justify-center gap-2 mb-6">
+            @for (i of estrelasArray; track i) {
+              <app-estrela [preenchida]="true" [tamanho]="48" />
+            }
+          </div>
+
+          <!-- Badge de conquista -->
+          <div class="flex flex-col items-center gap-2 mb-8">
+            <app-badge-conquista
+              [nome]="nomeDaConquista"
+              icone="🏆"
+              [corAccent]="corAccentDaCategoria"
+              [desbloqueada]="true"
+            />
+            <p class="text-sm font-semibold text-[var(--color-text-secondary)]">
+              {{ nomeDaConquista }}
+            </p>
+          </div>
+        } @else {
+          <p class="text-[2.5rem] font-extrabold text-[var(--color-imip-blue)] leading-tight mb-1">
+            Boa revisão!
+          </p>
+          <p class="text-base text-[var(--color-text-secondary)] mb-8">
+            Você já conquistou esta estrela! Continue para o próximo nível. 📖
+          </p>
+        }
+
+        <button
+          (click)="voltarParaAtividades()"
+          class="w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold text-lg hover:bg-[var(--color-imip-green-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] active:scale-[0.98] transition-all"
+        >
+          Voltar para Atividades
+        </button>
+      </div>
+    </div>
+
+  }
+
+</div>

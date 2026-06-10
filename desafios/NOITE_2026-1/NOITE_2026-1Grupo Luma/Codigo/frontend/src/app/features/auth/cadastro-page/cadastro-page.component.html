@@ -1,0 +1,107 @@
+<div class="min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)] px-6">
+
+  <!-- Logo IMIP -->
+  <img src="IMIP_logo.jpg" alt="IMIP" class="h-16 mb-6 object-contain" />
+
+  @if (cadastroConcluido()) {
+    <!-- ===== TELA DE SUCESSO ===== -->
+    <div class="w-full max-w-sm text-center">
+      <div
+        class="bg-[var(--color-surface)] rounded-[var(--rounded-xl)] p-8 shadow-md border border-[var(--color-border)]"
+      >
+        <p class="text-[var(--color-success)] text-lg font-bold mb-2">✅ Cadastro realizado!</p>
+        <p class="text-[var(--color-text-secondary)] mb-4">A matrícula do novo estudante é:</p>
+        <p class="text-[2rem] font-extrabold text-[var(--color-imip-green)] tracking-wide">
+          {{ matriculaGerada() }}
+        </p>
+        <p class="text-[var(--color-text-muted)] text-sm mt-3">
+          Anote esta matrícula. Ela será usada para acessar a plataforma.
+        </p>
+      </div>
+      <button
+        (click)="voltarLogin()"
+        class="mt-6 w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold text-lg hover:bg-[var(--color-imip-green-dark)] transition-colors cursor-pointer"
+      >
+        Ir para Login
+      </button>
+    </div>
+
+  } @else {
+    <!-- ===== FORMULÁRIO ===== -->
+    <h1 class="text-[1.75rem] font-bold text-[var(--color-text-primary)] mb-1">Novo Estudante</h1>
+    <p class="text-[var(--color-text-secondary)] mb-6">Preencha os dados para criar o acesso</p>
+
+    <form (ngSubmit)="onSubmit()" class="w-full max-w-sm flex flex-col gap-4">
+
+      <!-- Nome -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-[var(--color-text-secondary)]">
+          Nome do Estudante
+        </label>
+        <input
+          type="text"
+          [value]="nomeInput()"
+          (input)="onNomeInput($event)"
+          placeholder="Ex: Maria"
+          autocomplete="off"
+          class="w-full h-14 px-4 text-lg border-2 border-[var(--color-border)] rounded-[var(--rounded-xl)] focus:border-[var(--color-imip-green)] focus:outline-none transition-colors"
+        />
+      </div>
+
+      <!-- CPF -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-[var(--color-text-secondary)]">
+          CPF <span class="font-normal text-[var(--color-text-muted)]">(formato: 000.000.000-00)</span>
+        </label>
+        <input
+          type="text"
+          inputmode="numeric"
+          [value]="cpfInput()"
+          (input)="onCpfInput($event)"
+          placeholder="000.000.000-00"
+          maxlength="14"
+          autocomplete="off"
+          class="w-full h-14 px-4 text-lg border-2 border-[var(--color-border)] rounded-[var(--rounded-xl)] focus:border-[var(--color-imip-green)] focus:outline-none transition-colors text-center tracking-widest"
+        />
+      </div>
+
+      <!-- Idade -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-semibold text-[var(--color-text-secondary)]">
+          Idade <span class="font-normal text-[var(--color-text-muted)]">(3 a 12 anos)</span>
+        </label>
+        <input
+          type="text"
+          inputmode="numeric"
+          [value]="idadeInput()"
+          (input)="onIdadeInput($event)"
+          placeholder="Ex: 6"
+          maxlength="2"
+          autocomplete="off"
+          class="w-full h-14 px-4 text-lg border-2 border-[var(--color-border)] rounded-[var(--rounded-xl)] focus:border-[var(--color-imip-green)] focus:outline-none transition-colors text-center"
+        />
+      </div>
+
+      <!-- Erro -->
+      @if (erro()) {
+        <p class="text-[var(--color-error)] text-sm text-center font-semibold">{{ erro() }}</p>
+      }
+
+      <!-- Botão -->
+      <button
+        type="submit"
+        class="w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold text-lg hover:bg-[var(--color-imip-green-dark)] transition-colors cursor-pointer"
+      >
+        Cadastrar
+      </button>
+    </form>
+
+    <a
+      routerLink="/login"
+      class="mt-6 text-sm text-[var(--color-text-muted)] underline underline-offset-2 hover:text-[var(--color-text-secondary)] transition-colors"
+    >
+      Voltar para login
+    </a>
+  }
+
+</div>

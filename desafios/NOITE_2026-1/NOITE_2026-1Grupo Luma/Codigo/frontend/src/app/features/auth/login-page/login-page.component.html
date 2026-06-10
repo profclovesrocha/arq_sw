@@ -1,0 +1,92 @@
+<div class="min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)] px-6">
+
+  <!-- Logo IMIP -->
+  <img
+    src="IMIP_logo.jpg"
+    alt="IMIP"
+    class="h-16 mb-8 object-contain"
+  />
+
+  @if (modoProfessor()) {
+    <!-- ===== MODO PROFESSOR ===== -->
+    <div class="mb-6 text-center">
+      <h1 class="text-[1.75rem] font-bold text-[var(--color-text-primary)]">Alfabê</h1>
+      <p class="text-[var(--color-text-secondary)] mt-1">Acesse com sua matrícula e senha</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="w-full max-w-sm flex flex-col gap-4">
+      <input
+        type="text"
+        [value]="matriculaInput()"
+        (input)="onMatriculaInput($event)"
+        placeholder="Matrícula do Professor"
+        autocomplete="username"
+        class="w-full h-14 px-4 text-lg border-2 border-[var(--color-border)] rounded-[var(--rounded-xl)] focus:border-[var(--color-imip-blue)] focus:outline-none transition-colors text-center tracking-widest"
+      />
+      <input
+        type="password"
+        [value]="senhaInput()"
+        (input)="onSenhaInput($event)"
+        placeholder="Senha"
+        autocomplete="current-password"
+        class="w-full h-14 px-4 text-lg border-2 border-[var(--color-border)] rounded-[var(--rounded-xl)] focus:border-[var(--color-imip-blue)] focus:outline-none transition-colors text-center"
+      />
+
+      @if (erro()) {
+        <p class="text-[var(--color-error)] text-sm text-center font-semibold">{{ erro() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-blue)] text-white font-bold text-lg hover:opacity-90 transition-opacity cursor-pointer"
+      >
+        Entrar
+      </button>
+    </form>
+
+    <a
+      routerLink="/login"
+      class="mt-8 text-sm text-[var(--color-text-muted)] underline underline-offset-2 hover:text-[var(--color-text-secondary)] transition-colors"
+    >
+      Sou estudante
+    </a>
+
+  } @else {
+    <!-- ===== MODO ESTUDANTE ===== -->
+    <div class="mb-8 text-center">
+      <h1 class="text-[2rem] font-extrabold text-[var(--color-imip-green)]">Alfabê</h1>
+      <p class="text-[var(--color-text-secondary)] mt-1">Digite sua matrícula para entrar</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="w-full max-w-sm flex flex-col gap-4">
+      <input
+        type="text"
+        [value]="matriculaInput()"
+        (input)="onMatriculaInput($event)"
+        placeholder="Sua matrícula (ex: ALF-2026-0001)"
+        autocomplete="off"
+        class="w-full h-14 px-4 text-lg border-2 border-[var(--color-border)] rounded-[var(--rounded-xl)] focus:border-[var(--color-imip-green)] focus:outline-none transition-colors text-center tracking-widest"
+      />
+
+      @if (erro()) {
+        <p class="text-[var(--color-error)] text-sm text-center font-semibold">{{ erro() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="w-full min-h-[48px] rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold text-lg hover:bg-[var(--color-imip-green-dark)] transition-colors cursor-pointer"
+      >
+        Entrar
+      </button>
+    </form>
+
+    <a
+      routerLink="/login"
+      [queryParams]="{ tipo: 'professor' }"
+      class="mt-8 text-sm text-[var(--color-text-muted)] underline underline-offset-2 hover:text-[var(--color-text-secondary)] transition-colors"
+    >
+      Sou professor
+    </a>
+  }
+
+</div>

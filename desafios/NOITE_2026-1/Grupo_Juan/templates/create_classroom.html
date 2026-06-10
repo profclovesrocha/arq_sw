@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Nova Turma — Ravix{% endblock %}
+{% block extra_css %}
+<style>
+  .create-wrap { max-width: 620px; margin: 0 auto; }
+  .create-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+  .create-card h2 { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
+  .create-card .sub { color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 32px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-weight: 700; font-size: 0.85rem; color: #374151; margin-bottom: 7px; }
+  .form-control {
+    width: 100%; padding: 12px 14px; border: 2px solid #e5e7eb;
+    border-radius: 12px; font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem; font-weight: 600; color: #1e293b;
+    background: #f8fafc; transition: all 0.2s; outline: none;
+  }
+  .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(61,142,240,0.12); background: white; }
+  textarea.form-control { resize: vertical; min-height: 100px; }
+  .color-picker { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .color-opt { display: none; }
+  .color-swatch {
+    width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
+    border: 3px solid transparent; transition: all 0.2s;
+  }
+  .color-opt:checked + .color-swatch { border-color: #1e293b; transform: scale(1.15); }
+  .form-actions { display: flex; gap: 12px; margin-top: 28px; }
+  .preview-band {
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 28px;
+    transition: background 0.3s;
+  }
+  .preview-band h3 { color: white; font-size: 1.1rem; font-weight: 900; }
+  .preview-band p { color: rgba(255,255,255,0.7); font-size: 0.82rem; font-weight: 600; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="create-wrap">
+    <div style="margin-bottom:20px">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Voltar</a>
+    </div>
+    <div class="create-card">
+      <h2>🏫 Nova Turma</h2>
+      <p class="sub">Crie uma turma para seus alunos hospitalizados</p>
+
+      <!-- Preview -->
+      <div class="preview-band" id="previewBand" style="background:#3d8ef0">
+        <h3 id="previewName">Nome da turma</h3>
+        <p id="previewSubject">Disciplina</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('create_classroom') }}">
+        <div class="form-group">
+          <label>Nome da turma *</label>
+          <input type="text" name="name" class="form-control" placeholder="Ex: Matemática 8º Ano" required
+                 oninput="document.getElementById('previewName').textContent=this.value||'Nome da turma'">
+        </div>
+        <div class="form-group">
+          <label>Disciplina</label>
+          <input type="text" name="subject" class="form-control" placeholder="Ex: Matemática, Português, Ciências..."
+                 oninput="document.getElementById('previewSubject').textContent=this.value||'Disciplina'">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea name="description" class="form-control" placeholder="Descreva a turma, objetivos, público-alvo..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Cor da turma</label>
+          <div class="color-picker">
+            {% for color in colors %}
+            <input type="radio" name="color" id="c{{ loop.index }}" value="{{ color }}" class="color-opt"
+                   {% if loop.first %}checked{% endif %}
+                   onchange="document.getElementById('previewBand').style.background='{{ color }}'">
+            <label for="c{{ loop.index }}" class="color-swatch" style="background:{{ color }}"></label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-actions">
+          <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancelar</a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Criar Turma
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Nova Trilha{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Criar Trilhas Pedagógicas</h1>
+  </div>
+  
+  <form method="post" class="container">
+    <div class="form-aluno">
+        <div class="col-md-6"><label class="form-label">Aluno</label><select name="aluno_id" class="form-select" required>
+      <option value="">Escolha um aluno</option>
+      {% for student in students %}<option value="{{ student.id }}">{{ student.nome }} ({{ student.idade or '??' }} anos)</option>{% endfor %}
+    </select></div>
+    <div class="col-md-6"><label class="form-label">Professor (opcional)</label><select name="professor_id" class="form-select">
+      <option value="">-- Selecionar --</option>
+      {% for teacher in teachers %}<option value="{{ teacher.id }}">{{ teacher.nome }}</option>{% endfor %}
+      </select></div>
+      <div class="col-12"><label class="form-label">Objetivos de Aprendizagem</label><textarea class="form-control" name="metas" rows="3" required></textarea></div>
+    <div class="col-md-4"><label class="form-label">Estado Emocional</label><select class="form-select" name="estado_emocional">
+      <option value="">Estável</option>
+      <option value="ansioso">Ansioso</option>
+      <option value="triste">Triste</option>
+      <option value="eufórico">Eufórico</option>
+      <option value="indiferente">Indiferente</option>
+    </select></div>
+
+    <div class="col-12">
+      <button class="btn btn-primary">Gerar plano</button>
+      <a href="/" class="btn btn-secondary">Cancelar</a>
+    </div>
+    </div>
+    
+    
+
+   
+  </form>
+{% endblock %}

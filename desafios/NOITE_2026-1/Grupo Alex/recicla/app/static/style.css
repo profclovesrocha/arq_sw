@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e8f5e9; /* verde claro */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    background-color: #03661c; /* verde escuro */
+    color: white;
+    padding: 20px;
+}
+
+h1 {
+    color: #f6f8f6; /* verde mais intenso */
+}
+
+h2 {
+    color: #1b5e20; /* verde mais intenso */
+}
+
+.mapa {
+    margin: 30px auto;
+    width: 60%;
+    background: #c8e6c9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.mapa ul {
+    list-style: none;
+    padding: 0;
+}
+
+.mapa li {
+    background: #a5d6a7;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.localizar {
+    margin-top: 50px;
+}
+
+.btn-localizar {
+    background: linear-gradient(45deg, #2196f3, #64b5f6); /* degradê azul */
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-localizar:hover {
+    transform: scale(1.05);
+}

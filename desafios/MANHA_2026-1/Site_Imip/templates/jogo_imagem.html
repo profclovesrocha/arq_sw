@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> Jogo Adivinhe a palavra</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+
+<h1>Adivinhe a palavra</h1>
+
+<div class="emoji">🐱</div>
+
+    <button onclick="resposta('gato')">Gato</button>
+    <button onclick="resposta('cachorro')">Cachorro</button>
+    <button onclick="resposta('vaca')">Vaca</button>
+
+<p id="resultado"></p>
+
+<script>
+
+function resposta(palavra){
+
+    if(palavra=="gato"){
+
+        document.getElementById("resultado").innerHTML="Acertou 🎉"
+
+        fetch("/add_pontos", {
+  method: "POST",
+  credentials: "same-origin"
+})
+
+        setTimeout(() => {
+            window.location.href = "/home_aluno";
+        }, 1000);
+
+    }
+
+    else{
+
+        document.getElementById("resultado").innerHTML="Tente novamente 😊"
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

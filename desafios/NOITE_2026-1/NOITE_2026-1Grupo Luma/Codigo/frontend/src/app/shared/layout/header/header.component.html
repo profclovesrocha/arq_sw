@@ -1,0 +1,27 @@
+<header
+  class="flex items-center justify-between px-6 lg:px-12 py-4 bg-white shadow-sm border-b border-[var(--color-border)]"
+>
+  <div class="flex items-center gap-3">
+    <span class="text-lg font-bold text-[var(--color-text-primary)]">{{ saudacao }}</span>
+    <span class="text-sm text-[var(--color-text-secondary)]">ID: {{ idUsuario() }}</span>
+  </div>
+  <div class="flex items-center gap-2">
+    @if (tipoUsuario() === 'estudante') {
+      <a
+        routerLink="/perfil"
+        routerLinkActive="bg-[var(--color-background)] text-[var(--color-imip-green-dark)]"
+        class="min-h-[48px] min-w-[48px] flex items-center justify-center rounded-full text-xl text-[var(--color-text-muted)] hover:bg-[var(--color-background)] hover:text-[var(--color-imip-green)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] transition-colors"
+        aria-label="Meu perfil"
+        title="Meu perfil"
+      >
+        👤
+      </a>
+    }
+    <button
+      (click)="sair.emit()"
+      class="min-h-[48px] px-6 py-2 rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-semibold hover:bg-[var(--color-imip-green-dark)] transition-colors cursor-pointer"
+    >
+      Sair
+    </button>
+  </div>
+</header>

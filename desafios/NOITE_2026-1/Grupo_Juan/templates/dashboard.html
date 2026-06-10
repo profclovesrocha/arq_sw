@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Ravix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .dashboard-hero {
+    background: linear-gradient(135deg, #1a3a6e, #2563eb, #3d8ef0);
+    border-radius: 20px; padding: 32px 36px; color: white;
+    margin-bottom: 32px; position: relative; overflow: hidden;
+  }
+  .dashboard-hero::after {
+    content: '🏥';
+    position: absolute; right: 32px; top: 50%;
+    transform: translateY(-50%); font-size: 5rem; opacity: 0.15;
+  }
+  .dashboard-hero h2 { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
+  .dashboard-hero p { opacity: 0.8; font-weight: 600; font-size: 0.95rem; }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-bottom: 32px;
+  }
+  .stat-card {
+    background: white; border-radius: 16px;
+    padding: 22px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    display: flex; align-items: center; gap: 16px;
+    border: 1px solid #e2e8f0;
+  }
+  .stat-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; flex-shrink: 0;
+  }
+  .stat-num { font-size: 1.8rem; font-weight: 900; color: #1e293b; line-height: 1; }
+  .stat-label { font-size: 0.8rem; color: #64748b; font-weight: 700; margin-top: 2px; }
+
+  .section-title {
+    font-size: 1.1rem; font-weight: 800; color: #1e293b;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Classroom Cards */
+  .classrooms-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px; margin-bottom: 40px;
+  }
+  .classroom-card {
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer; text-decoration: none; display: block;
+    border: 1px solid #e2e8f0;
+    background: white;
+  }
+  .classroom-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.14); }
+  .cc-header {
+    padding: 24px 24px 18px;
+    position: relative;
+  }
+  .cc-header h3 { font-size: 1.1rem; font-weight: 800; color: white; margin-bottom: 4px; }
+  .cc-header .cc-subject { font-size: 0.8rem; color: rgba(255,255,255,0.75); font-weight: 600; }
+  .cc-header .cc-teacher-badge {
+    position: absolute; bottom: -18px; right: 20px;
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 3px solid white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 1rem; color: white;
+  }
+  .cc-body { padding: 28px 24px 20px; }
+  .cc-desc { font-size: 0.85rem; color: #64748b; font-weight: 600; line-height: 1.5; margin-bottom: 14px; }
+  .cc-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.78rem; color: #94a3b8; font-weight: 700;
+  }
+  .cc-code {
+    background: #f1f5f9; border-radius: 8px;
+    padding: 4px 10px; font-family: monospace; font-size: 0.85rem;
+    color: #475569; font-weight: 700; letter-spacing: 1px;
+  }
+
+  /* Add class buttons */
+  .action-row {
+    display: flex; gap: 12px; margin-bottom: 28px;
+  }
+  .add-card {
+    flex: 1; background: white; border-radius: 16px;
+    border: 2px dashed #e2e8f0; padding: 20px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .add-card:hover { border-color: var(--primary); background: #eff6ff; }
+  .add-card .add-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: #eff6ff; color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .add-card h4 { font-size: 0.9rem; font-weight: 800; color: #374151; margin-bottom: 2px; }
+  .add-card p { font-size: 0.78rem; color: #94a3b8; font-weight: 600; }
+
+  /* Recent posts */
+  .recent-post {
+    background: white; border-radius: 14px;
+    padding: 16px 20px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 10px;
+    display: flex; align-items: flex-start; gap: 14px;
+    transition: box-shadow 0.2s;
+  }
+  .recent-post:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .rp-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .rp-title { font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+  .rp-meta { font-size: 0.77rem; color: #94a3b8; font-weight: 600; }
+
+  /* Modal join */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; padding: 36px;
+    width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal h3 { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; }
+  .modal p { color: #64748b; font-size: 0.88rem; font-weight: 600; margin-bottom: 20px; }
+  .modal-input {
+    width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb;
+    border-radius: 12px; font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 3px; text-align: center; outline: none; margin-bottom: 16px;
+  }
+  .modal-input:focus { border-color: var(--primary); }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns button { flex: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Hero -->
+  <div class="dashboard-hero">
+    <h2>Olá, {{ current_user.name.split()[0] }}! 👋</h2>
+    <p>
+      {% if current_user.role == 'teacher' %}
+        Você está fazendo a diferença na vida de alunos hospitalizados. Continue assim! 💙
+      {% else %}
+        Continue firme nos estudos! A doença é temporária, o conhecimento é para sempre. 🌟
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#eff6ff; color:#3d8ef0">
+        <i class="fas fa-chalkboard"></i>
+      </div>
+      <div>
+        <div class="stat-num">{{ classrooms|length }}</div>
+        <div class="stat-label">{{ 'Turmas criadas' if current_user.role == 'teacher' else 'Turmas inscritas' }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef3c7; color:#f59e0b">
+        <i class="fas fa-file-alt"></i>
+      </div>
+      <div>
+        <div class="stat-num">{{ recent_posts|length }}</div>
+        <div class="stat-label">Publicações recentes</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#d1fae5; color:#10b981">
+        <i class="fas fa-heart"></i>
+      </div>
+      <div>
+        <div class="stat-num">{{ total_students }}</div>
+        <div class="stat-label">{{ 'Alunos atendidos' if current_user.role == 'teacher' else 'Conexões de aprendizado' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Row -->
+  <div class="action-row">
+    {% if current_user.role == 'teacher' %}
+    <a href="{{ url_for('create_classroom') }}" class="add-card">
+      <div class="add-icon"><i class="fas fa-plus"></i></div>
+      <div>
+        <h4>Criar nova turma</h4>
+        <p>Adicione uma nova turma para seus alunos</p>
+      </div>
+    </a>
+    {% else %}
+    <div class="add-card" onclick="document.getElementById('joinModal').classList.add('active')">
+      <div class="add-icon"><i class="fas fa-sign-in-alt"></i></div>
+      <div>
+        <h4>Entrar em uma turma</h4>
+        <p>Use o código fornecido pelo seu professor</p>
+      </div>
+    </div>
+    {% endif %}
+    <a href="{{ url_for('profile') }}" class="add-card">
+      <div class="add-icon" style="background:#fdf4ff; color:#a855f7"><i class="fas fa-user-circle"></i></div>
+      <div>
+        <h4>Meu perfil</h4>
+        <p>Veja e edite suas informações</p>
+      </div>
+    </a>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+    <!-- Classrooms -->
+    <div>
+      <div class="section-title">
+        <i class="fas fa-th-large" style="color:var(--primary)"></i>
+        Minhas Turmas
+      </div>
+      {% if classrooms %}
+      <div class="classrooms-grid">
+        {% for c in classrooms %}
+        <a href="{{ url_for('classroom_view', cid=c.id) }}" class="classroom-card">
+          <div class="cc-header" style="background:{{ c.color }}">
+            <h3>{{ c.name }}</h3>
+            <div class="cc-subject">{{ c.subject or 'Sem disciplina' }}</div>
+            <div class="cc-teacher-badge" style="background:{{ c.teacher.avatar_color }}">
+              {{ c.teacher.name[0].upper() }}
+            </div>
+          </div>
+          <div class="cc-body">
+            <div class="cc-desc">{{ (c.description or 'Sem descrição.')[:80] }}{% if c.description and c.description|length > 80 %}...{% endif %}</div>
+            <div class="cc-meta">
+              <span><i class="fas fa-users" style="color:#94a3b8"></i> {{ c.enrollments|length }} aluno(s)</span>
+              {% if current_user.role == 'teacher' %}
+              <span class="cc-code">{{ c.code }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align:center; padding:48px; color:#94a3b8;">
+        <div style="font-size:3rem; margin-bottom:12px;">📚</div>
+        <div style="font-weight:800; margin-bottom:6px;">Nenhuma turma ainda</div>
+        <div style="font-size:0.85rem;">
+          {% if current_user.role == 'teacher' %}Crie sua primeira turma!{% else %}Peça o código ao seu professor!{% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent Activity -->
+    <div>
+      <div class="section-title">
+        <i class="fas fa-bell" style="color:#f59e0b"></i>
+        Atividade Recente
+      </div>
+      {% if recent_posts %}
+        {% for post in recent_posts %}
+        <a href="{{ url_for('classroom_view', cid=post.classroom_id) }}" style="text-decoration:none">
+          <div class="recent-post">
+            <div class="rp-icon" style="
+              {% if post.post_type == 'assignment' %}background:#fef3c7; color:#d97706;
+              {% elif post.post_type == 'material' %}background:#d1fae5; color:#059669;
+              {% else %}background:#dbeafe; color:#2563eb;{% endif %}
+            ">
+              <i class="fas fa-{% if post.post_type == 'assignment' %}tasks{% elif post.post_type == 'material' %}book{% else %}bullhorn{% endif %}"></i>
+            </div>
+            <div>
+              <div class="rp-title">{{ (post.title or post.content)[:40] }}{% if (post.title or post.content)|length > 40 %}...{% endif %}</div>
+              <div class="rp-meta">{{ post.classroom.name }}</div>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div style="text-align:center; padding:32px; color:#94a3b8; font-size:0.85rem; font-weight:600;">
+          Sem atividade recente
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Join Modal -->
+<div class="modal-overlay" id="joinModal">
+  <div class="modal">
+    <h3>🎓 Entrar em turma</h3>
+    <p>Digite o código de 6 dígitos fornecido pelo seu professor.</p>
+    <form method="POST" action="{{ url_for('join_classroom') }}">
+      <input type="text" name="code" class="modal-input" placeholder="ABC123" maxlength="6" required>
+      <div class="modal-btns">
+        <button type="button" class="btn btn-outline" onclick="document.getElementById('joinModal').classList.remove('active')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

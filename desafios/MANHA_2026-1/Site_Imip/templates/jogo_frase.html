@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Complete a frase</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body> 
+<h1>Complete a frase</h1>
+
+<p>O cachorro faz ____</p>
+
+<button onclick="resposta('au')">Au Au</button>
+<button onclick="resposta('miau')">Miau</button>
+<button onclick="resposta('piu')">Piu</button>
+
+<p>O gato faz ____</p>
+
+<button onclick="resposta('piu')">Piu Piu</button>
+<button onclick="resposta ('miau')">Miau</button>
+<button onclick="resposta ('au')">Au Au </button>
+
+<p id="resultado"></p>
+
+<script>
+
+let etapa = 1;
+
+function resposta(valor){
+
+    if(etapa === 1){
+
+        if(valor === "au"){
+            document.getElementById("resultado").innerHTML =
+            "Correto! Agora próxima 👇";
+
+            etapa = 2; // passa pra próxima pergunta
+
+        } else {
+            document.getElementById("resultado").innerHTML =
+            "Tente novamente 😊";
+        }
+
+    } else if(etapa === 2){
+
+        if(valor === "miau"){
+            document.getElementById("resultado").innerHTML =
+            "Muito bem! 🎉";
+
+            fetch("/add_pontos", {
+  method: "POST",
+  credentials: "same-origin"
+})
+
+            setTimeout(() => {
+                window.location.href = "/home_aluno";
+            }, 1000);
+
+        } 
+        
+        else {
+            document.getElementById("resultado").innerHTML =
+            "Tente novamente 😊";
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Geolocalizador Natural</title>
+    <style>
+        :root {
+            --green-primary: #2d6a4f; /* Verde Floresta Profundo */
+            --green-secondary: #40916c; /* Verde Musgo Vibrante */
+            --green-tertiary: #b7e4c7; /* Verde Chá Pálido */
+            --green-light: #d8f3dc; /* Verde Quase Branco */
+            --text-dark: #1b4332;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: var(--green-light);
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(183, 228, 199, 0.3) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(64, 145, 108, 0.2) 0px, transparent 50%);
+        }
+
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(27, 67, 50, 0.15);
+            width: 100%;
+            max-width: 650px;
+            border: 2px solid var(--green-tertiary);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Elemento decorativo orgânico sutil idêntico ao login */
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 100px;
+            height: 100px;
+            background-color: var(--green-tertiary);
+            border-radius: 50%;
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        h2 {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            color: var(--green-primary);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2::before {
+            content: '🗺️';
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        .status {
+            margin: 15px 0;
+            font-weight: 600;
+            color: var(--green-secondary);
+            font-size: 15px;
+            background-color: rgba(216, 243, 220, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 1px dashed var(--green-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Container do Google Maps estilizado */
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.1);
+            border: 2px solid var(--green-primary);
+            position: relative;
+            z-index: 1;
+            background-color: #e5e3df; /* Cor padrão de fundo do mapa enquanto carrega */
+        }
+
+        .btn-logout {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 25px;
+            background-color: transparent;
+            color: #873636; /* Tom marrom/avermelhado sutil para o botão de sair */
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-logout:hover {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: #8da99d;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <h2>Sua Posição na Expedição</h2>
+    
+    <div id="status-geo" class="status">Solicitando permissão aos sensores do dispositivo...</div>
+    
+    <div id="map"></div>
+
+    <a href="{{ url_for('auth.logout') }}" class="btn-logout">Encerrar Expedição</a>
+    
+    <div class="footer-note">Ambiente Protegido via Container Docker</div>
+</div>
+
+<script>
+    let map;
+    let marker;
+
+    function initMap() {
+        // Inicializa focado no Brasil por padrão
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: -14.235, lng: -51.925 },
+            zoom: 4,
+            // Customização opcional: desativa botões poluentes do mapa se quiser um visual mais limpo
+            mapTypeControl: false,
+            streetViewControl: false
+        });
+        
+        buscarGeolocalizacao();
+    }
+
+    function buscarGeolocalizacao() {
+        const statusText = document.getElementById("status-geo");
+
+        if (!navigator.geolocation) {
+            statusText.innerText = "Geolocalização não suportada neste dispositivo.";
+            statusText.style.color = "#873636";
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const meuLocal = { lat: lat, lng: lon };
+
+                statusText.innerText = `Coordenadas Fixadas! (Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)})`;
+                statusText.style.color = "var(--green-primary)";
+                statusText.style.borderStyle = "solid";
+
+                map.setCenter(meuLocal);
+                map.setZoom(16);
+
+                if (marker) marker.setMap(null);
+                marker = new google.maps.Marker({
+                    position: meuLocal,
+                    map: map,
+                    title: "Você está aqui!",
+                    animation: google.maps.Animation.DROP
+                });
+
+                enviarParaOServidor(lat, lon);
+            },
+            (error) => {
+                statusText.innerText = "Permissão negada ou sinal de localização indisponível.";
+                statusText.style.color = "#873636";
+                statusText.style.backgroundColor = "#f8d7da";
+            }
+        );
+    }
+
+    function enviarParaOServidor(lat, lon) {
+        fetch("/api/save-geo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ latitude: lat, longitude: lon })
+        })
+        .then(response => response.json())
+        .then(data => console.log("Container:", data))
+        .catch(err => console.error("Erro de sincronização:", err));
+    }
+</script>
+
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_AQUI&callback=initMap">
+</script>
+
+</body>
+</html>

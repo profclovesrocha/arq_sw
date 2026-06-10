@@ -1,0 +1,67 @@
+<div class="min-h-screen bg-[var(--color-background)]">
+  <app-shell>
+    <div class="max-w-2xl mx-auto">
+
+      <!-- Botão voltar -->
+      <button
+        (click)="voltarParaDashboard()"
+        class="mb-6 flex items-center gap-1 font-bold text-[var(--color-imip-green)] hover:underline focus:outline-none"
+      >
+        ← Voltar para Atividades
+      </button>
+
+      <!-- Grid de conquistas -->
+      <section class="mb-10">
+        <h2 class="text-xl font-extrabold text-[var(--color-text-primary)] mb-4">🏆 Minhas Conquistas</h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 gap-4">
+          @for (c of conquistas(); track c.categoriaId + c.nivelId) {
+            <div class="flex flex-col items-center gap-1">
+              <app-badge-conquista
+                [nome]="c.nome"
+                icone="🏆"
+                [corAccent]="c.corAccent"
+                [desbloqueada]="c.desbloqueada"
+              />
+              <span class="text-xs text-center text-[var(--color-text-muted)] leading-tight">
+                {{ c.nome }}
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Progresso por categoria -->
+      <section>
+        <h2 class="text-xl font-extrabold text-[var(--color-text-primary)] mb-4">📊 Progresso por Categoria</h2>
+        <div class="flex flex-col gap-4">
+          @for (item of progressoPorCategoria(); track item.cat.id) {
+            <div
+              class="bg-white rounded-[var(--rounded-xl)] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] flex items-center justify-between"
+              [style.border-left]="'4px solid ' + item.cat.corAccent"
+            >
+              <div>
+                <p class="font-bold text-[var(--color-text-primary)]">{{ item.cat.nome }}</p>
+                <p class="text-sm text-[var(--color-text-secondary)]">
+                  @if (item.concluidos === 0) {
+                    Não iniciado
+                  } @else {
+                    {{ item.concluidos }} de 3 concluídos
+                  }
+                </p>
+              </div>
+              <div class="flex gap-2">
+                @for (i of [1, 2, 3]; track i) {
+                  <div
+                    class="w-4 h-4 rounded-full"
+                    [style.background-color]="i <= item.concluidos ? item.cat.corAccent : 'var(--color-border)'"
+                  ></div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+    </div>
+  </app-shell>
+</div>

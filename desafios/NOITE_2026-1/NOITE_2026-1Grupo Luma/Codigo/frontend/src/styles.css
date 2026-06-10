@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import 'tailwindcss';
+
+:root {
+  /* Institucional */
+  --color-imip-green: #3EA653;
+  --color-imip-green-dark: #2D7A3E;
+  --color-imip-blue: #3B5998;
+
+  /* Superfícies */
+  --color-background: #F8FDF9;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+
+  /* Categorias */
+  --color-vogais-pastel: #FDE8E8;
+  --color-vogais-accent: #E53E3E;
+  --color-consoantes-pastel: #DBEAFE;
+  --color-consoantes-accent: #3B82F6;
+  --color-silabas-pastel: #FEF3C7;
+  --color-silabas-accent: #D97706;
+  --color-palavras-pastel: #D1FAE5;
+  --color-palavras-accent: #059669;
+
+  /* Feedback */
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+
+  /* Gamificação */
+  --color-star-gold: #FBC02D;
+  --color-achievement-purple: #8B5CF6;
+
+  /* Neutros */
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-disabled: #D1D5DB;
+
+  /* Rounded */
+  --rounded-sm: 0.5rem;
+  --rounded-md: 0.75rem;
+  --rounded-lg: 1rem;
+  --rounded-xl: 1.5rem;
+  --rounded-full: 9999px;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* ── Animações ── */
+
+@keyframes shake-error {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake-error 300ms ease-in-out;
+}
+
+@keyframes scale-bounce {
+  0%   { transform: scale(0.8); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.animate-scale-bounce {
+  animation: scale-bounce 400ms ease-out forwards;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2000ms ease-in-out infinite;
+}
+
+@keyframes confetti-burst {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  50%  { transform: scale(1.04); box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.animate-confetti {
+  animation: confetti-burst 1200ms ease-out forwards;
+}

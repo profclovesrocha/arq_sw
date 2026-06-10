@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Plano | {{ plan.titulo }}{% endblock %}
+{% block content %}
+  <div class="header">
+    <div>
+      <h1>{{ plan.titulo }}</h1>
+      <p class="text-muted">Aluno: {{ plan['aluno_nome'] or 'não informado' }} | Professor: {{ plan['professor_nome'] or 'não associado' }}</p>
+    </div>
+    <a class="btn btn-secondary" href="/">Voltar</a>
+  </div>
+  <div class="container-metas">
+    <div class="card ">
+      <div class="card-body">
+        <h5 class="card-title">Metas de Aprendizagem</h5>
+        <p class="card-subtitle">{{ plan.metas }}</p>
+        <p class="card-subtitle"><strong>Estado Emocional:</strong> {{ plan.estado_emocional or 'estável' }}</p>
+      </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Roteiro gerado automática</h5>
+      <pre class="card-subtitle">{{ plan.roteiro }}</pre>
+    </div>
+  </div>
+  </div>
+  
+{% endblock %}

@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% block title %}{{ classroom.name }} — Ravix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .classroom-header {
+    border-radius: 20px; overflow: hidden; margin-bottom: 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .ch-top {
+    padding: 36px 36px 24px;
+    position: relative; overflow: hidden;
+  }
+  .ch-top::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.07'%3E%3Cpath d='M20 20.5V18H0v5h5v5H0v5h20v-9.5zm-2 4.5h-6v-4h6v4zm0-6h-6v-4h6v4z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .ch-top h1 { font-size: 2rem; font-weight: 900; color: white; margin-bottom: 6px; z-index: 1; position: relative; }
+  .ch-top .ch-sub { color: rgba(255,255,255,0.75); font-weight: 700; font-size: 0.92rem; z-index: 1; position: relative; }
+  .ch-bottom {
+    background: white; padding: 18px 36px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .ch-teacher { display: flex; align-items: center; gap: 10px; }
+  .ch-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: white; font-size: 0.9rem;
+  }
+  .ch-teacher-name { font-weight: 800; font-size: 0.9rem; color: #374151; }
+  .ch-teacher-label { font-size: 0.75rem; color: #9ca3af; font-weight: 600; }
+  .code-chip {
+    background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-chip span { font-family: monospace; font-size: 1.1rem; font-weight: 800; letter-spacing: 3px; color: #475569; }
+  .code-chip small { font-size: 0.73rem; font-weight: 700; color: #94a3b8; }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 280px; gap: 24px; }
+
+  /* Post form */
+  .post-form-card {
+    background: white; border-radius: 16px;
+    border: 1px solid #e2e8f0; overflow: hidden;
+    margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .post-type-tabs {
+    display: flex; border-bottom: 2px solid #f1f5f9;
+  }
+  .tab-btn {
+    flex: 1; padding: 12px; border: none; background: none;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem;
+    color: #94a3b8; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); margin-bottom: -2px; }
+  .post-form-body { padding: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .pf-input, .pf-textarea {
+    width: 100%; padding: 10px 14px;
+    border: 2px solid #e5e7eb; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+    font-weight: 600; color: #1e293b; outline: none;
+    transition: border-color 0.2s;
+  }
+  .pf-input:focus, .pf-textarea:focus { border-color: var(--primary); }
+  .pf-textarea { resize: vertical; min-height: 90px; }
+  .pf-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+  /* Posts */
+  .post-card {
+    background: white; border-radius: 16px;
+    border: 1px solid #e2e8f0; margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .post-header { padding: 18px 22px 14px; display: flex; align-items: flex-start; gap: 12px; }
+  .post-avatar {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: white; font-size: 0.9rem;
+  }
+  .post-meta-line {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  }
+  .post-author { font-weight: 800; font-size: 0.88rem; color: #1e293b; }
+  .post-time { font-size: 0.76rem; color: #9ca3af; font-weight: 600; }
+  .post-title { font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+  .post-content { font-size: 0.9rem; color: #475569; font-weight: 600; line-height: 1.65; }
+  .post-due {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fef3c7; color: #92400e;
+    border-radius: 8px; padding: 4px 12px;
+    font-size: 0.78rem; font-weight: 800; margin-top: 10px;
+  }
+  .post-body { padding: 0 22px 16px; }
+  .post-divider { border: none; border-top: 1px solid #f1f5f9; margin: 0; }
+
+  /* Comments */
+  .comments { padding: 14px 22px; background: #fafbfc; }
+  .comment { display: flex; gap: 10px; margin-bottom: 12px; }
+  .comment-avatar {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: white; font-size: 0.75rem;
+  }
+  .comment-bubble {
+    background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 8px 14px; flex: 1;
+  }
+  .comment-author { font-size: 0.78rem; font-weight: 800; color: #374151; margin-bottom: 2px; }
+  .comment-text { font-size: 0.85rem; color: #475569; font-weight: 600; }
+  .comment-form { display: flex; gap: 8px; margin-top: 8px; }
+  .comment-input {
+    flex: 1; padding: 8px 14px; border: 2px solid #e5e7eb;
+    border-radius: 10px; font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 600; outline: none;
+    transition: border-color 0.2s;
+  }
+  .comment-input:focus { border-color: var(--primary); }
+  .comment-submit {
+    background: var(--primary); color: white; border: none;
+    border-radius: 10px; padding: 8px 14px; cursor: pointer;
+    font-size: 0.85rem; transition: background 0.2s;
+  }
+  .comment-submit:hover { background: #2563eb; }
+
+  /* Sidebar */
+  .sidebar-card {
+    background: white; border-radius: 16px;
+    border: 1px solid #e2e8f0; padding: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+  }
+  .sidebar-title { font-size: 0.88rem; font-weight: 800; color: #374151; margin-bottom: 14px; }
+  .student-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid #f1f5f9;
+  }
+  .student-item:last-child { border-bottom: none; }
+  .s-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: white; font-size: 0.78rem;
+  }
+  .s-name { font-size: 0.85rem; font-weight: 700; color: #374151; }
+  .s-ward { font-size: 0.75rem; color: #9ca3af; font-weight: 600; }
+
+  .delete-btn {
+    background: none; border: none; color: #ef4444;
+    cursor: pointer; padding: 4px 8px; border-radius: 6px;
+    font-size: 0.8rem; transition: background 0.2s;
+    margin-left: auto;
+  }
+  .delete-btn:hover { background: #fee2e2; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Classroom Header -->
+  <div class="classroom-header">
+    <div class="ch-top" style="background: {{ classroom.color }}">
+      <h1>{{ classroom.name }}</h1>
+      <div class="ch-sub">{{ classroom.subject or '' }} • {{ students|length }} aluno(s)</div>
+    </div>
+    <div class="ch-bottom">
+      <div class="ch-teacher">
+        <div class="ch-avatar" style="background:{{ classroom.teacher.avatar_color }}">
+          {{ classroom.teacher.name[0].upper() }}
+        </div>
+        <div>
+          <div class="ch-teacher-name">{{ classroom.teacher.name }}</div>
+          <div class="ch-teacher-label">Professor(a)</div>
+        </div>
+      </div>
+      {% if current_user.role == 'teacher' %}
+      <div class="code-chip">
+        <small>CÓDIGO DA TURMA</small>
+        <span id="codeText">{{ classroom.code }}</span>
+        <button onclick="copyCode()" style="background:none;border:none;cursor:pointer;color:#64748b" title="Copiar">
+          <i class="fas fa-copy"></i>
+        </button>
+      </div>
+      {% endif %}
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-sm">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </a>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Main Content -->
+    <div>
+      <!-- Post Form (teacher only) -->
+      {% if current_user.role == 'teacher' and classroom.teacher_id == current_user.id %}
+      <div class="post-form-card">
+        <div class="post-type-tabs">
+          <button class="tab-btn active" data-type="announcement" onclick="setType(this,'announcement')">
+            <i class="fas fa-bullhorn"></i> Aviso
+          </button>
+          <button class="tab-btn" data-type="assignment" onclick="setType(this,'assignment')">
+            <i class="fas fa-tasks"></i> Atividade
+          </button>
+          <button class="tab-btn" data-type="material" onclick="setType(this,'material')">
+            <i class="fas fa-book"></i> Material
+          </button>
+        </div>
+        <div class="post-form-body">
+          <form method="POST" action="{{ url_for('create_post', cid=classroom.id) }}">
+            <input type="hidden" name="post_type" id="postType" value="announcement">
+            <div class="form-row">
+              <input type="text" name="title" class="pf-input" placeholder="Título (opcional)">
+              <input type="datetime-local" name="due_date" id="dueDate" class="pf-input" style="display:none" title="Data de entrega">
+            </div>
+            <textarea name="content" class="pf-textarea" placeholder="Escreva sua publicação aqui..." required></textarea>
+            <div class="pf-actions">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Publicar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Posts Feed -->
+      {% if posts %}
+        {% for post in posts %}
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar" style="background:{{ post.author.avatar_color }}">
+              {{ post.author.name[0].upper() }}
+            </div>
+            <div style="flex:1">
+              <div class="post-meta-line">
+                <span class="post-author">{{ post.author.name }}</span>
+                <span class="badge badge-{{ post.post_type }}">
+                  <i class="fas fa-{% if post.post_type == 'assignment' %}tasks{% elif post.post_type == 'material' %}book{% else %}bullhorn{% endif %}"></i>
+                  {{ 'Aviso' if post.post_type == 'announcement' else ('Atividade' if post.post_type == 'assignment' else 'Material') }}
+                </span>
+                <span class="post-time">{{ post.created_at.strftime('%d/%m %H:%M') }}</span>
+              </div>
+              {% if post.title %}
+              <div class="post-title">{{ post.title }}</div>
+              {% endif %}
+            </div>
+            {% if current_user.role == 'teacher' and classroom.teacher_id == current_user.id %}
+            <form method="POST" action="{{ url_for('delete_post', pid=post.id) }}" onsubmit="return confirm('Remover publicação?')">
+              <button type="submit" class="delete-btn"><i class="fas fa-trash"></i></button>
+            </form>
+            {% endif %}
+          </div>
+          <div class="post-body">
+            <div class="post-content">{{ post.content }}</div>
+            {% if post.due_date %}
+            <div class="post-due">
+              <i class="fas fa-clock"></i>
+              Entrega: {{ post.due_date.strftime('%d/%m/%Y às %H:%M') }}
+            </div>
+            {% endif %}
+          </div>
+          <hr class="post-divider">
+          <div class="comments">
+            {% for comment in post.comments %}
+            <div class="comment">
+              <div class="comment-avatar" style="background:{{ comment.author.avatar_color }}">
+                {{ comment.author.name[0].upper() }}
+              </div>
+              <div class="comment-bubble">
+                <div class="comment-author">{{ comment.author.name }}</div>
+                <div class="comment-text">{{ comment.content }}</div>
+              </div>
+            </div>
+            {% endfor %}
+            <form method="POST" action="{{ url_for('add_comment', pid=post.id) }}" class="comment-form">
+              <input type="text" name="content" class="comment-input" placeholder="Adicionar comentário..." required>
+              <button type="submit" class="comment-submit"><i class="fas fa-paper-plane"></i></button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <div style="text-align:center; padding:60px; color:#94a3b8;">
+        <div style="font-size:3.5rem; margin-bottom:14px;">📝</div>
+        <div style="font-weight:800; font-size:1.1rem; margin-bottom:6px;">Nenhuma publicação ainda</div>
+        {% if current_user.role == 'teacher' %}
+        <div style="font-size:0.88rem;">Use o formulário acima para publicar o primeiro conteúdo!</div>
+        {% else %}
+        <div style="font-size:0.88rem;">Aguarde seu professor publicar conteúdos aqui.</div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      {% if classroom.description %}
+      <div class="sidebar-card">
+        <div class="sidebar-title"><i class="fas fa-info-circle" style="color:var(--primary)"></i> Sobre a turma</div>
+        <p style="font-size:0.85rem; color:#64748b; font-weight:600; line-height:1.6">{{ classroom.description }}</p>
+      </div>
+      {% endif %}
+
+      <div class="sidebar-card">
+        <div class="sidebar-title"><i class="fas fa-users" style="color:var(--secondary)"></i> Alunos ({{ students|length }})</div>
+        {% for student in students %}
+        <div class="student-item">
+          <div class="s-avatar" style="background:{{ student.avatar_color }}">{{ student.name[0].upper() }}</div>
+          <div>
+            <div class="s-name">{{ student.name.split()[0] }}</div>
+            {% if student.ward %}<div class="s-ward">{{ student.ward }}</div>{% endif %}
+          </div>
+        </div>
+        {% else %}
+        <div style="font-size:0.82rem; color:#9ca3af; font-weight:600; text-align:center; padding:8px 0;">Nenhum aluno inscrito</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function setType(btn, type) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('postType').value = type;
+    document.getElementById('dueDate').style.display = type === 'assignment' ? 'block' : 'none';
+  }
+  function copyCode() {
+    const code = document.getElementById('codeText').textContent;
+    navigator.clipboard.writeText(code);
+    const btn = event.currentTarget;
+    btn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i>', 2000);
+  }
+</script>
+{% endblock %}

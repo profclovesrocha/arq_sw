@@ -1,0 +1,29 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+form {
+  width: 500px;
+  height: 200px;
+  background-color: #cbc3e3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px #ff8da1 solid;
+  border-radius: 5px;
+}
+
+p {
+  color: antiquewhite;
+  font-style: italic;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+label {
+  margin: 0.8rem;
+}

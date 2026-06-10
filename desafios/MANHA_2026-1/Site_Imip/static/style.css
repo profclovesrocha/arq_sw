@@ -1,0 +1,103 @@
+/* ESTILO GERAL DO SITE */
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+background: linear-gradient(135deg,#d9f2ff,#f3ffe6);
+text-align:center;
+padding:40px;
+}
+
+/* TITULO PRINCIPAL */
+
+h1{
+color:#1b6ca8;
+font-size:36px;
+margin-bottom:20px;
+}
+
+h2{
+color:#2f855a;
+margin-top:20px;
+}
+
+p{
+font-size:18px;
+margin:10px;
+}
+
+/* RESULTADO DOS JOGOS */
+
+#resultado{
+font-size:20px;
+font-weight:bold;
+margin-top:15px;
+}
+
+/* PONTUAÇÃO */
+
+#pontuacao{
+
+font-size:22px;
+color:#1b6ca8;
+margin-top:20px;
+}
+
+/* BOTÕES */
+
+button{
+background:#95b7c1;
+border:none;
+padding:12px 20px;
+margin:10px;
+border-radius:8px;
+font-size:16px;
+color:white;
+cursor:pointer;
+transition:0.3s;
+}
+
+/* EFEITO DO BOTÃO */
+
+button:hover{
+background:#1b6ca8;
+transform:scale(1.1);
+}
+
+/* CAMPOS DE TEXTO */
+
+input, select{
+padding:10px;
+width:250px;
+border-radius:6px;
+border:1px solid #ccc;
+margin-top:5px;
+}
+
+/* FORMULÁRIOS */
+
+form{
+background:rgb(255, 255, 255);
+padding:30px;
+border-radius:15px;
+display:inline-block;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* EMOJIS DOS JOGOS */
+h2{
+font-size:28px;
+}
+
+/* PAINEL DO PROFESSOR */
+
+#nomeAluno{
+font-size:20px;
+font-weight:bold;
+color:#2f855a;
+}
+
+footer{
+margin-top:40px;
+font-size:14px;
+color:#555;
+}
