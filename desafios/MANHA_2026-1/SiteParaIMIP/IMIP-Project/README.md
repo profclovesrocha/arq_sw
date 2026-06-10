@@ -9,7 +9,7 @@ visualização de desempenho por parte dos professores.
 O back-end foi desenvolvido utilizando Node.js, sendo responsável pela
 lógica de negócio, gerenciamento de sessões, autenticação de usuários e comunicação com o
 banco de dados.
-O banco de dados utilizado foi o SQLite, escolhido por sua simplicidade e facilidade de integração,
+O banco de dados utilizado foi o PostgreSQL, escolhido por sua escalabilidade e suporte JSON,
 sendo responsável pelo armazenamento de informações como dados dos usuários e pontuações
 dos alunos.
 A comunicação entre as camadas ocorre por meio de requisições HTTP, sendo os dados
