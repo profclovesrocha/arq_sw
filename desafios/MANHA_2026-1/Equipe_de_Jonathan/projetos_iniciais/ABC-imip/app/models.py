@@ -41,6 +41,13 @@ class Quiz(db.Model):
     level = db.Column(db.String(50))
 
 
+    questions = db.relationship(
+        "Question",
+        backref="quiz",
+        lazy=True
+    )
+
+
 # =========================
 # TABELA DE QUESTÕES
 # =========================
