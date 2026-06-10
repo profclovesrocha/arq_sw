@@ -13,3 +13,11 @@ python app.py
 Acesse: http://127.0.0.1:5000
 
 Login: professor@imip.br / 123456
+
+#### Turma: 3°P de SI (manhã)
+#### Equipe:
+- Rafael Queiroga
+- João Victor
+- Cauã Castro
+- Lucas Correia 
+- George Guilherme  
