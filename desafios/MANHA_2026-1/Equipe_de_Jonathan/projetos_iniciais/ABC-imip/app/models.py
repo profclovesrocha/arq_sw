@@ -41,6 +41,13 @@ class Quiz(db.Model):
     level = db.Column(db.String(50))
 
 
+    questions = db.relationship(
+        "Question",
+        backref="quiz",
+        lazy=True
+    )
+
+
 # =========================
 # TABELA DE QUESTÕES
 # =========================
@@ -93,6 +100,16 @@ class Attempt(db.Model):
     # Nota do quiz
     score = db.Column(db.Float)
 
+    student = db.relationship(
+        "User",
+        backref="attempts"
+    )
+
+    quiz = db.relationship(
+        "Quiz",
+        backref="attempts"
+    )
+
 
 # =========================
 # RESPOSTAS
@@ -120,4 +137,13 @@ class Answer(db.Model):
 
     is_correct = db.Column(
         db.Boolean
+    )
+
+    attempt = db.relationship(
+        "Attempt",
+        backref="answers"
+    )
+
+    question = db.relationship(
+        "Question"
     )

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso - EcoLocaliza</title>
+    <style>
+        :root {
+            --green-primary: #2d6a4f;
+            --green-secondary: #40916c;
+            --green-tertiary: #b7e4c7;
+            --green-light: #d8f3dc;
+            --text-dark: #1b4332;
+            --white: #ffffff;
+            --google-blue: #4285F4;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--green-light);
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(183, 228, 199, 0.3) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(64, 145, 108, 0.2) 0px, transparent 50%);
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(27, 67, 50, 0.15);
+            width: 320px;
+            border: 2px solid var(--green-tertiary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--green-primary);
+            font-weight: 600;
+        }
+
+        /* Abas para alternar entre Login e Cadastro */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--green-tertiary);
+        }
+
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            color: var(--green-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--green-primary);
+            border-bottom: 3px solid var(--green-primary);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 1px solid var(--green-tertiary);
+            border-radius: 8px;
+            background-color: var(--white);
+            color: var(--text-dark);
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--green-secondary);
+            box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--green-primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover { background-color: var(--green-secondary); }
+
+        /* Divisor "OU" */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #8da99d;
+            font-size: 12px;
+            margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--green-tertiary);
+        }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+
+        /* Botão estilizado do Google */
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--white);
+            color: #757575;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .btn-google:hover {
+            background-color: #f7f7f7;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn-google svg { width: 18px; height: 18px; }
+
+        .flash {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .flash.error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .flash.success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        
+        .form-panel { display: none; }
+        .form-panel.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>EcoLocaliza 🍃</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category if category != 'message' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">Entrar</div>
+        <div class="tab" onclick="switchTab('register')">Cadastrar</div>
+    </div>
+
+    <div id="login-panel" class="form-panel active">
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <input type="text" name="username" placeholder="Usuário" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <button type="submit">Iniciar Expedição</button>
+        </form>
+    </div>
+
+    <div id="register-panel" class="form-panel">
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <input type="text" name="reg_username" placeholder="Escolha um Usuário" required>
+            <input type="password" name="reg_password" placeholder="Crie uma Senha" required>
+            <button type="submit" style="background-color: var(--green-secondary);">Criar Minha Conta</button>
+        </form>
+    </div>
+
+    <div class="divider">ou</div>
+
+    <a href="{{ url_for('auth.google_login') }}" class="btn-google">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"/>
+        </svg>
+        Entrar com o Google
+    </a>
+</div>
+
+<script>
+    // Função simples em JavaScript para alternar as abas visualmente sem recarregar a página
+    function switchTab(type) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+
+        if(type === 'login') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('login-panel').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('register-panel').classList.add('active');
+        }
+    }
+</script>
+</body>
+</html>

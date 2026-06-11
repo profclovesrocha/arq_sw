@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}AlfaIA — IMIP{% endblock %}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:#F0F4F8;color:#1a202c;min-height:100vh}
+.navbar{background:#1e3a5f;padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.nav-brand{color:#fff;font-size:17px;font-weight:700;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{color:#93c5fd;text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;transition:.15s}
+.nav-links a:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-user{color:#cbd5e1;font-size:12px;padding:0 12px;border-left:1px solid rgba(255,255,255,.15)}
+.container{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #e2e8f0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
+.badge-iniciante{background:#DBEAFE;color:#1e40af}
+.badge-intermediario{background:#FEF3C7;color:#92400e}
+.badge-avancado{background:#D1FAE5;color:#065f46}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:.15s}
+.btn-primary{background:#1d4ed8;color:#fff}.btn-primary:hover{background:#1e40af}
+.btn-success{background:#059669;color:#fff}.btn-success:hover{background:#047857}
+.btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-outline{background:#fff;color:#374151;border:1px solid #d1d5db}.btn-outline:hover{background:#f9fafb}
+.btn-sm{padding:6px 12px;font-size:12px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#374151}
+.form-control{width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:#fff;transition:.15s}
+.form-control:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.alert-success{background:#D1FAE5;color:#065f46;border-left:4px solid #059669}
+.alert-danger{background:#FEE2E2;color:#991b1b;border-left:4px solid #dc2626}
+.alert-info{background:#DBEAFE;color:#1e40af;border-left:4px solid #3b82f6}
+.alert-warning{background:#FEF3C7;color:#92400e;border-left:4px solid #d97706}
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#f8fafc;padding:10px 14px;text-align:left;font-weight:600;font-size:12px;color:#64748b;text-transform:uppercase;border-bottom:1px solid #e2e8f0}
+tbody td{padding:12px 14px;border-top:1px solid #f1f5f9}
+tbody tr:hover{background:#f8fafc}
+.progress-bar{background:#e2e8f0;border-radius:100px;height:10px;overflow:hidden}
+.progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#1d4ed8,#7c3aed)}
+.stat-num{font-size:30px;font-weight:700;color:#1e3a5f;line-height:1}
+.stat-lbl{font-size:12px;color:#64748b;margin-top:4px}
+.empty{text-align:center;padding:48px 20px;color:#94a3b8}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-hd h2{font-size:16px;font-weight:700;color:#1e3a5f}
+hr{border:none;border-top:1px solid #e2e8f0;margin:20px 0}
+@media(max-width:640px){.container{padding:1.25rem}.grid2,.grid3{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a class="nav-brand" href="{{ url_for("pedagogico.dashboard") }}">&#127973; AlfaIA — IMIP</a>
+  <div class="nav-links">
+    <a href="{{ url_for("pedagogico.dashboard") }}">&#128218; Trilhas</a>
+    <a href="{{ url_for("relatorios.index") }}">&#128202; Relatorios</a>
+    <a href="{{ url_for("acolhimento.inicio") }}">&#127918; Acolhimento</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="nav-user">{{ current_user.username }} &middot; {{ current_user.role }}</span>
+    <a href="{{ url_for("auth.logout") }}" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.2)">Sair</a>
+  </div>
+</nav>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

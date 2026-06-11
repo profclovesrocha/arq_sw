@@ -1,0 +1,33 @@
+{% extends "shared/base.html" %}
+{% block title %}Nova Trilha{% endblock %}
+{% block content %}
+<div style="max-width:520px">
+  <div style="font-size:22px;font-weight:700;color:#1e3a5f;margin-bottom:4px">&#10024; Criar trilha com IA</div>
+  <div style="font-size:14px;color:#64748b;margin-bottom:24px">A IA gera historia e atividades automaticamente.</div>
+  {% if not alunos %}
+  <div class="card" style="text-align:center;padding:32px">
+    <p style="color:#64748b;margin-bottom:16px">Nenhum aluno cadastrado.</p>
+    <a href="{{ url_for("pedagogico.novo_aluno") }}" class="btn btn-primary">Cadastrar aluno</a>
+  </div>
+  {% else %}
+  <div class="card">
+    <form method="POST">
+      <div class="form-group"><label class="form-label">Titulo da trilha</label>
+        <input type="text" name="titulo" class="form-control" placeholder="Ex: Aventuras no Hospital" required autofocus></div>
+      <div class="form-group"><label class="form-label">Aluno</label>
+        <select name="aluno_id" class="form-control" required>
+          <option value="">Selecione...</option>
+          {% for a in alunos %}
+          <option value="{{ a.id }}">{{ a.nome }} - {{ a.idade }} anos ({{ a.nivel_atual.replace("-"," ") }})</option>
+          {% endfor %}
+        </select></div>
+      <div class="alert alert-info" style="font-size:12px">&#129302; A IA gera historia personalizada e atividades para o nivel do aluno selecionado.</div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <a href="{{ url_for("pedagogico.dashboard") }}" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-primary">&#10024; Criar com IA</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

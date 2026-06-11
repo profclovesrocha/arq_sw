@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login - AlfaIA — IMIP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:linear-gradient(135deg,#0f172a,#1e3a5f);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.box{background:#fff;border-radius:16px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.logo{text-align:center;margin-bottom:28px}
+.logo-icon{font-size:48px;display:block;margin-bottom:8px}
+.logo h1{font-size:20px;font-weight:700;color:#1e3a5f}
+.logo p{font-size:13px;color:#64748b;margin-top:4px}
+.form-group{margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#374151}
+input,select{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:.15s}
+input:focus,select:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.btn{width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:600;border:none;cursor:pointer;background:#1d4ed8;color:#fff;transition:.15s;margin-top:6px}
+.btn:hover{background:#1e40af}
+.link{text-align:center;margin-top:16px;font-size:13px;color:#64748b}
+.link a{color:#1d4ed8;text-decoration:none;font-weight:500}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;background:#FEE2E2;color:#991b1b;border-left:4px solid #dc2626}
+</style></head>
+<body>
+<div class="box">
+  <div class="logo">
+    <span class="logo-icon">&#127973;</span>
+    <h1>AlfaIA — IMIP</h1>
+    <p>Sistema de Trilhas de Alfabetização com IA — IMIP</p>
+  </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="alert">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+  <form method="POST">
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" name="email" placeholder="professor@imip.br" required autofocus>
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
+    </div>
+    <button type="submit" class="btn">Entrar</button>
+  </form>
+  <div class="link">Nao tem conta? <a href="{{ url_for("auth.registro") }}">Cadastre-se</a></div>
+</div>
+</body></html>

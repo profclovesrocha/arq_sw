@@ -1,0 +1,30 @@
+{% extends "shared/base.html" %}
+{% block title %}Acolhimento Ludico{% endblock %}
+{% block content %}
+<div style="font-size:22px;font-weight:700;color:#1e3a5f;margin-bottom:4px">&#127918; Modulo de Acolhimento Ludico</div>
+<div style="font-size:14px;color:#64748b;margin-bottom:24px">Humanizacao do aprendizado para criancas internadas no IMIP.</div>
+<div class="grid3" style="margin-bottom:32px">
+  {% for m in mascotes %}
+  <div class="card" style="text-align:center;padding:28px;border-top:4px solid {{ m.cor }}">
+    <span style="font-size:52px;display:block;margin-bottom:10px">{{ m.emoji }}</span>
+    <div style="font-size:16px;font-weight:700;color:#1e3a5f;margin-bottom:4px">{{ m.nome }}</div>
+    <div style="font-size:13px;color:#64748b">{{ m.desc }}</div>
+  </div>
+  {% endfor %}
+</div>
+<div class="sec-hd"><h2>Como o sistema humaniza o aprendizado</h2></div>
+<div class="grid2">
+  <div class="card"><div style="font-size:28px;margin-bottom:10px">&#128214;</div>
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">Historias personalizadas</h3>
+    <p style="font-size:13px;color:#64748b">A IA gera historias usando o nome da crianca, adaptadas ao seu nivel de alfabetizacao.</p></div>
+  <div class="card"><div style="font-size:28px;margin-bottom:10px">&#127919;</div>
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">No ritmo da crianca</h3>
+    <p style="font-size:13px;color:#64748b">Cada trilha respeita o nivel atual, desde pre-silabico ate alfabetico.</p></div>
+  <div class="card"><div style="font-size:28px;margin-bottom:10px">&#127942;</div>
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">Progresso visivel</h3>
+    <p style="font-size:13px;color:#64748b">A barra de progresso e a celebracao ao concluir reforçam positivamente o esforco da crianca.</p></div>
+  <div class="card"><div style="font-size:28px;margin-bottom:10px">&#128274;</div>
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">Seguranca LGPD</h3>
+    <p style="font-size:13px;color:#64748b">Dados de saude protegidos com bcrypt, controle de acesso por papel e cookies seguros em producao.</p></div>
+</div>
+{% endblock %}

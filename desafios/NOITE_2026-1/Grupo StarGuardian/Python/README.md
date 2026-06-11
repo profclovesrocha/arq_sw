@@ -4,6 +4,9 @@ GRUPO:
 
 *   Lucas José
 *   Pedro Henrique
+*   Alexsandro correia
+*   Lucas Henrique Gomes da Silva
+*   João Lucas Silverio de Santana
 
 
 # Exploradores do Espaço: Jornada do Conhecimento Estelar

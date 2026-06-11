@@ -9,7 +9,7 @@ visualização de desempenho por parte dos professores.
 O back-end foi desenvolvido utilizando Node.js, sendo responsável pela
 lógica de negócio, gerenciamento de sessões, autenticação de usuários e comunicação com o
 banco de dados.
-O banco de dados utilizado foi o SQLite, escolhido por sua simplicidade e facilidade de integração,
+O banco de dados utilizado foi o PostgreSQL, escolhido por sua escalabilidade e suporte JSON,
 sendo responsável pelo armazenamento de informações como dados dos usuários e pontuações
 dos alunos.
 A comunicação entre as camadas ocorre por meio de requisições HTTP, sendo os dados
@@ -24,9 +24,11 @@ a implementação rápida de funcionalidades essenciais, como autenticação e c
 Durante os processos finais o framework Flask foi substituído pelo ambiente Node.js por ser 
 mais clássico e minimalista e cria servidores de forma rápida, após uma análise ele era 
 o mais eficiente para o desenvolvimento do site.
-A escolha do SQLite como sistema de gerenciamento de banco de dados deve-se à sua natureza
+A escolha inicial do SQLite como sistema de gerenciamento de banco de dados deve-se à sua natureza
 embarcada, dispensando a necessidade de configuração de servidores adicionais, o que o torna
-adequado para aplicações de pequeno porte.
+adequado para aplicações de pequeno porte.Porém ao longo do desenvolvimento do projeto foi realizada
+a migração para o PostgreSQL pois a aplicação passou a atender múltiplos usuários simultâneos,
+oferece suporte nativo para o JSON e é um sistema cliente-servidor.
 A separação entre usuários do tipo aluno e professor foi implementada com o objetivo de
 proporcionar diferentes níveis de acesso e funcionalidades, permitindo uma experiência mais
 organizada e funcional.
@@ -44,8 +46,8 @@ priorizando a facilidade de implementação. Contudo, reconhece-se que a utiliza
 hash seria mais adequada em um ambiente de produção.
 Na parte do desenvolvimento, o Flask foi substituído pelo Node.js devido à sua arquitetura assíncrona orientada a eventos,
 que lida melhor com milhares de conexões simultâneas, à unificação da linguagem e ao seu vasto ecossistema de pacotes.
-Em relação ao banco de dados, o SQLite foi escolhido por sua praticidade, embora apresente
-limitações de escalabilidade quando comparado a soluções mais robustas, como PostgreSQL.
+Em relação ao banco de dados, o SQLite foi substitupido pelo PostgreSQL, pois o projeto passou por uma escalabilidade maior
+necessitando atender múlitplos usuários e suporte nativo para JSON.
 Outro ponto relevante foi a substituição do uso de armazenamento local (localStorage) pelo banco
 de dados, visando maior consistência e confiabilidade das informações.
 Por fim, a escolha por requisições HTTP tradicionais em detrimento de tecnologias como

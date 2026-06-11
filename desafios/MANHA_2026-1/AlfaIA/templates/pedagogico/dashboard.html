@@ -1,0 +1,76 @@
+{% extends "shared/base.html" %}
+{% block title %}Dashboard - AlfaIA — IMIP{% endblock %}
+{% block content %}
+<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+  <div>
+    <div style="font-size:22px;font-weight:700;color:#1e3a5f">&#128218; Painel Pedagogico</div>
+    <div style="font-size:14px;color:#64748b">Bem-vindo, {{ current_user.username }}!</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a href="{{ url_for("pedagogico.novo_aluno") }}" class="btn btn-outline">+ Novo aluno</a>
+    <a href="{{ url_for("pedagogico.nova_trilha") }}" class="btn btn-primary">&#10024; Nova trilha</a>
+  </div>
+</div>
+<div class="grid3" style="margin-bottom:24px">
+  <div class="card" style="text-align:center;padding:20px">
+    <div class="stat-num">{{ trilhas|length }}</div>
+    <div class="stat-lbl">Trilhas criadas</div>
+  </div>
+  <div class="card" style="text-align:center;padding:20px">
+    <div class="stat-num">{{ alunos|length }}</div>
+    <div class="stat-lbl">Alunos ativos</div>
+  </div>
+  <div class="card" style="text-align:center;padding:20px">
+    <div class="stat-num">{{ trilhas|selectattr("status","eq","ativa")|list|length }}</div>
+    <div class="stat-lbl">Trilhas ativas</div>
+  </div>
+</div>
+<div class="sec-hd"><h2>Minhas trilhas</h2></div>
+{% if trilhas %}
+<div class="grid2">
+  {% for t in trilhas %}
+  <div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;justify-content:space-between;gap:8px">
+      <div>
+        <div style="font-size:15px;font-weight:600">{{ t.titulo }}</div>
+        <div style="font-size:12px;color:#64748b">&#128100; {{ t.aluno.nome }} &middot; {{ t.aluno.idade }} anos</div>
+      </div>
+      <span class="badge badge-{{ t.nivel }}">{{ t.nivel }}</span>
+    </div>
+    <div style="font-size:12px;color:#94a3b8">&#128336; {{ t.criada_em.strftime("%d/%m/%Y as %H:%M") }}</div>
+    <div style="display:flex;gap:8px;margin-top:auto">
+      <a href="{{ url_for("pedagogico.ver_trilha", trilha_id=t.id) }}" class="btn btn-outline btn-sm">Ver trilha &rarr;</a>
+      <form method="POST" action="{{ url_for("pedagogico.deletar_trilha", trilha_id=t.id) }}" style="margin-left:auto" onsubmit="return confirm("Remover?")">
+        <button type="submit" class="btn btn-danger btn-sm">&#128465;</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+  <div style="font-size:48px;margin-bottom:12px">&#128219;</div>
+  <h3 style="color:#64748b;margin-bottom:8px">Nenhuma trilha criada</h3>
+  <a href="{{ url_for("pedagogico.nova_trilha") }}" class="btn btn-primary">&#10024; Criar primeira trilha</a>
+</div>
+{% endif %}
+{% if alunos %}
+<hr>
+<div class="sec-hd"><h2>Alunos cadastrados</h2></div>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Nome</th><th>Idade</th><th>Nivel</th><th>Acao</th></tr></thead>
+    <tbody>
+      {% for a in alunos %}
+      <tr>
+        <td><strong>{{ a.nome }}</strong></td>
+        <td>{{ a.idade }} anos</td>
+        <td>{{ a.nivel_atual.replace("-"," ") }}</td>
+        <td><a href="{{ url_for("relatorios.progresso", aluno_id=a.id) }}" class="btn btn-outline btn-sm">Relatorio</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "shared/base.html" %}
+{% block title %}Novo Aluno{% endblock %}
+{% block content %}
+<div style="max-width:500px">
+  <div style="font-size:22px;font-weight:700;color:#1e3a5f;margin-bottom:4px">&#128100; Cadastrar aluno</div>
+  <div style="font-size:14px;color:#64748b;margin-bottom:24px">Cadastre uma crianca internada no IMIP.</div>
+  <div class="card">
+    <form method="POST">
+      <div class="form-group"><label class="form-label">Nome da crianca</label>
+        <input type="text" name="nome" class="form-control" required autofocus></div>
+      <div class="form-group"><label class="form-label">Idade</label>
+        <input type="number" name="idade" class="form-control" min="4" max="14" value="7" required></div>
+      <div class="form-group"><label class="form-label">Nivel de alfabetizacao</label>
+        <select name="nivel_atual" class="form-control">
+          {% for n in niveis %}<option value="{{ n }}">{{ n.replace("-"," ").title() }}</option>{% endfor %}
+        </select></div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <a href="{{ url_for("pedagogico.dashboard") }}" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-success">Cadastrar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

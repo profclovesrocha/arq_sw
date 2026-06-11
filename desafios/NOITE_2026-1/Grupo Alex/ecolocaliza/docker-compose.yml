@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados MySQL
+  db:
+    image: mysql:8.0
+    container_name: eco_mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'ecolocaliza_db'
+      MYSQL_USER: 'eco_user'
+      MYSQL_PASSWORD: 'eco_senha'
+      MYSQL_ROOT_PASSWORD: 'root_senha_super_segura'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Serviço da nossa Aplicação Flask
+  web:
+    build: .
+    container_name: eco_flask_app
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:

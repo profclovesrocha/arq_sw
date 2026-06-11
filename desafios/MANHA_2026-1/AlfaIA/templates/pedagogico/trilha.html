@@ -1,0 +1,337 @@
+{% extends "shared/base.html" %}
+{% block title %}{{ trilha.titulo }}{% endblock %}
+{% block content %}
+
+<a href="{{ url_for("pedagogico.dashboard") }}" style="color:#64748b;text-decoration:none;font-size:13px;display:inline-flex;align-items:center;gap:4px">&#8592; Voltar</a>
+
+<!-- CABECALHO -->
+<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:16px 0 20px">
+  <div>
+    <div style="font-size:22px;font-weight:700;color:#1e3a5f">{{ trilha.titulo }}</div>
+    <div style="font-size:14px;color:#64748b;margin-top:4px">
+      &#128100; {{ trilha.aluno.nome }} &middot; {{ trilha.aluno.idade }} anos &middot;
+      <span class="badge badge-{{ trilha.nivel }}">{{ trilha.nivel }}</span>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#94a3b8">{{ trilha.criada_em.strftime("%d/%m/%Y") }}</div>
+</div>
+
+<!-- BARRA DE PROGRESSO -->
+{% set total = atividades|length %}
+{% set concluidas = atividades|selectattr("concluida")|list|length %}
+{% set pct = (concluidas / total * 100)|int if total > 0 else 0 %}
+<div class="card" style="margin-bottom:24px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:14px;font-weight:600">Progresso da trilha</span>
+    <span style="font-size:14px;font-weight:700;color:#1d4ed8">{{ concluidas }}/{{ total }} &mdash; {{ pct }}%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:{{ pct }}%"></div></div>
+</div>
+
+<!-- ATIVIDADES -->
+<div style="display:flex;flex-direction:column;gap:20px">
+{% for at in atividades %}
+
+  {% if at.tipo == "historia" %}
+    <!-- ═══ HISTORIA ═══════════════════════════════════════════ -->
+    {% set partes = at.conteudo.split("|", 1) %}
+    {% set emoji  = partes[0] if partes|length > 1 else "📖" %}
+    {% set texto  = partes[1] if partes|length > 1 else at.conteudo %}
+    <div class="card" style="border-left:4px solid #7c3aed;background:{% if at.concluida %}#fafafa{% else %}#fff{% endif %}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-size:28px">{{ emoji }}</span>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#1e3a5f">{{ at.titulo }}</div>
+          <div style="font-size:11px;color:#7c3aed;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Historia para ler</div>
+        </div>
+        {% if at.concluida %}<span style="margin-left:auto;font-size:12px;color:#059669;font-weight:600">&#10003; Lida</span>{% endif %}
+      </div>
+      <!-- TEXTO DA HISTORIA -->
+      <div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border-radius:12px;padding:20px 24px;margin-bottom:16px;border:1px solid #ddd6fe">
+        <div style="font-size:15px;line-height:1.85;color:#1e293b;white-space:pre-line">{{ texto }}</div>
+      </div>
+      {% if not at.concluida %}
+      <form method="POST" action="{{ url_for("pedagogico.concluir_atividade", at_id=at.id) }}">
+        <button type="submit" class="btn btn-success" style="width:100%">&#10003; Terminei de ler!</button>
+      </form>
+      {% else %}
+      <div style="text-align:center;padding:10px;background:#D1FAE5;border-radius:8px;color:#065f46;font-weight:600;font-size:14px">&#127881; Historia lida com sucesso!</div>
+      {% endif %}
+    </div>
+
+  {% elif at.tipo == "quiz" %}
+    <!-- ═══ QUIZ ════════════════════════════════════════════════ -->
+    {% set p = at.conteudo.split("|") %}
+    {% set pergunta  = p[0] if p|length > 0 else "" %}
+    {% set op_a      = p[1] if p|length > 1 else "" %}
+    {% set op_b      = p[2] if p|length > 2 else "" %}
+    {% set op_c      = p[3] if p|length > 3 else "" %}
+    {% set op_d      = p[4] if p|length > 4 else "" %}
+    {% set resposta  = p[5] if p|length > 5 else "" %}
+    {% set feedback  = p[6] if p|length > 6 else "Correto!" %}
+    <div class="card" style="border-left:4px solid #1d4ed8;background:{% if at.concluida %}#fafafa{% else %}#fff{% endif %}" id="card-{{ at.id }}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-size:24px">&#127919;</span>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#1e3a5f">{{ at.titulo }}</div>
+          <div style="font-size:11px;color:#1d4ed8;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Atividade — Quiz</div>
+        </div>
+        {% if at.concluida %}<span style="margin-left:auto;font-size:12px;color:#059669;font-weight:600">&#10003; Concluida</span>{% endif %}
+      </div>
+      <div style="background:#EFF6FF;border-radius:10px;padding:16px 18px;margin-bottom:16px;border:1px solid #BFDBFE">
+        <p style="font-size:15px;font-weight:600;color:#1e3a5f;line-height:1.55">{{ pergunta }}</p>
+      </div>
+      {% if not at.concluida %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px" id="opcoes-{{ at.id }}">
+        {% for op in [op_a, op_b, op_c, op_d] %}{% if op %}
+        <button onclick="responderQuiz({{ at.id }}, '{{ op }}', '{{ resposta }}', '{{ feedback }}')"
+          style="padding:12px 16px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;text-align:left;color:#1e293b"
+          onmouseover="this.style.borderColor='#3b82f6';this.style.background='#EFF6FF'"
+          onmouseout="if(!this.dataset.selected){this.style.borderColor='#e2e8f0';this.style.background='#fff'}">
+          {{ op }}
+        </button>
+        {% endif %}{% endfor %}
+      </div>
+      <div id="feedback-{{ at.id }}" style="display:none;border-radius:8px;padding:12px 16px;font-size:14px;font-weight:600;margin-bottom:12px"></div>
+      <form method="POST" action="{{ url_for("pedagogico.concluir_atividade", at_id=at.id) }}" id="form-{{ at.id }}" style="display:none">
+        <button type="submit" class="btn btn-success" style="width:100%">Proxima atividade &#8594;</button>
+      </form>
+      {% else %}
+      <div style="text-align:center;padding:10px;background:#D1FAE5;border-radius:8px;color:#065f46;font-weight:600">&#127881; Atividade concluida!</div>
+      {% endif %}
+    </div>
+
+  {% elif at.tipo == "completar" %}
+    <!-- ═══ COMPLETAR ══════════════════════════════════════════ -->
+    {% set p = at.conteudo.split("|") %}
+    {% set enunciado = p[0] if p|length > 0 else "" %}
+    {% set op_a      = p[1] if p|length > 1 else "" %}
+    {% set op_b      = p[2] if p|length > 2 else "" %}
+    {% set op_c      = p[3] if p|length > 3 else "" %}
+    {% set resposta  = p[4] if p|length > 4 else "" %}
+    {% set feedback  = p[5] if p|length > 5 else "Correto!" %}
+    <div class="card" style="border-left:4px solid #059669;background:{% if at.concluida %}#fafafa{% else %}#fff{% endif %}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-size:24px">&#9999;&#65039;</span>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#1e3a5f">{{ at.titulo }}</div>
+          <div style="font-size:11px;color:#059669;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Atividade — Complete</div>
+        </div>
+        {% if at.concluida %}<span style="margin-left:auto;font-size:12px;color:#059669;font-weight:600">&#10003; Concluida</span>{% endif %}
+      </div>
+      <div style="background:#F0FDF4;border-radius:10px;padding:16px 18px;margin-bottom:16px;border:1px solid #BBF7D0">
+        <p style="font-size:18px;font-weight:700;color:#1e3a5f;text-align:center;letter-spacing:.05em">{{ enunciado }}</p>
+      </div>
+      {% if not at.concluida %}
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        {% for op in [op_a, op_b, op_c] %}{% if op %}
+        <button onclick="responderCompletar({{ at.id }}, '{{ op }}', '{{ resposta }}', '{{ feedback }}')"
+          style="flex:1;min-width:100px;padding:14px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;color:#1e293b"
+          onmouseover="this.style.borderColor='#059669';this.style.background='#F0FDF4'"
+          onmouseout="if(!this.dataset.selected){this.style.borderColor='#e2e8f0';this.style.background='#fff'}">
+          {{ op }}
+        </button>
+        {% endif %}{% endfor %}
+      </div>
+      <div id="feedback-completar-{{ at.id }}" style="display:none;border-radius:8px;padding:12px 16px;font-size:14px;font-weight:600;margin-bottom:12px"></div>
+      <form method="POST" action="{{ url_for("pedagogico.concluir_atividade", at_id=at.id) }}" id="form-completar-{{ at.id }}" style="display:none">
+        <button type="submit" class="btn btn-success" style="width:100%">Proxima atividade &#8594;</button>
+      </form>
+      {% else %}
+      <div style="text-align:center;padding:10px;background:#D1FAE5;border-radius:8px;color:#065f46;font-weight:600">&#127881; Atividade concluida!</div>
+      {% endif %}
+    </div>
+
+  {% elif at.tipo == "ligar" %}
+    <!-- ═══ LIGAR ═══════════════════════════════════════════════ -->
+    {% set pares = at.conteudo.split("|") %}
+    <div class="card" style="border-left:4px solid #d97706;background:{% if at.concluida %}#fafafa{% else %}#fff{% endif %}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-size:24px">&#128279;</span>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#1e3a5f">{{ at.titulo }}</div>
+          <div style="font-size:11px;color:#d97706;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Atividade — Ligue</div>
+        </div>
+        {% if at.concluida %}<span style="margin-left:auto;font-size:12px;color:#059669;font-weight:600">&#10003; Concluida</span>{% endif %}
+      </div>
+      <div style="background:#FFFBEB;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #FDE68A">
+        <p style="font-size:14px;color:#92400e;font-weight:600;margin-bottom:12px;text-align:center">Clique na letra e depois na figura que começa com ela!</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            {% for par in pares %}{% set kv = par.split(":") %}{% if kv|length == 2 %}
+            <div onclick="selecionarLetro('{{ kv[0] }}', {{ at.id }})" id="letra-{{ at.id }}-{{ kv[0] }}"
+              style="padding:12px;border-radius:8px;border:2px solid #FDE68A;background:#fff;font-size:20px;font-weight:800;text-align:center;cursor:pointer;margin-bottom:8px;color:#92400e;transition:.15s">
+              {{ kv[0] }}
+            </div>
+            {% endif %}{% endfor %}
+          </div>
+          <div>
+            {% for par in pares %}{% set kv = par.split(":") %}{% if kv|length == 2 %}
+            <div onclick="selecionarFigura('{{ kv[1] }}', '{{ kv[0] }}', {{ at.id }})" id="figura-{{ at.id }}-{{ kv[1] }}"
+              style="padding:12px;border-radius:8px;border:2px solid #FDE68A;background:#fff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:8px;color:#1e293b;transition:.15s">
+              {{ kv[1] }}
+            </div>
+            {% endif %}{% endfor %}
+          </div>
+        </div>
+      </div>
+      <div id="feedback-ligar-{{ at.id }}" style="display:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:12px"></div>
+      {% if not at.concluida %}
+      <form method="POST" action="{{ url_for("pedagogico.concluir_atividade", at_id=at.id) }}" id="form-ligar-{{ at.id }}" style="display:none">
+        <button type="submit" class="btn btn-success" style="width:100%">Muito bem! Proxima &#8594;</button>
+      </form>
+      {% else %}
+      <div style="text-align:center;padding:10px;background:#D1FAE5;border-radius:8px;color:#065f46;font-weight:600">&#127881; Atividade concluida!</div>
+      {% endif %}
+    </div>
+
+  {% else %}
+    <!-- ═══ TIPO GENERICO ══════════════════════════════════════ -->
+    <div class="card" style="border-left:4px solid #64748b">
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">{{ at.titulo }}</div>
+      <p style="font-size:14px;color:#374151;line-height:1.65;white-space:pre-wrap">{{ at.conteudo }}</p>
+      {% if not at.concluida %}
+      <form method="POST" action="{{ url_for("pedagogico.concluir_atividade", at_id=at.id) }}" style="margin-top:14px">
+        <button type="submit" class="btn btn-success">Concluir &#10003;</button>
+      </form>
+      {% endif %}
+    </div>
+  {% endif %}
+
+{% endfor %}
+</div>
+
+<!-- CELEBRACAO FINAL -->
+{% if pct == 100 %}
+<div class="card" style="text-align:center;padding:36px;margin-top:24px;background:linear-gradient(135deg,#D1FAE5,#E0F2FE);border:2px solid #6ee7b7">
+  <div style="font-size:56px;margin-bottom:12px">&#127881;</div>
+  <h3 style="color:#065f46;font-size:20px;margin-bottom:6px">Parabens, {{ trilha.aluno.nome }}!</h3>
+  <p style="color:#047857;font-size:14px">Voce completou todas as atividades desta trilha. Continue assim!</p>
+  <a href="{{ url_for("pedagogico.dashboard") }}" class="btn btn-success" style="margin-top:16px">Ver outras trilhas</a>
+</div>
+{% endif %}
+
+<!-- JAVASCRIPT INTERATIVO -->
+<script>
+// ── QUIZ ────────────────────────────────────────────────
+function responderQuiz(id, escolha, correta, feedback) {
+  const botoes = document.querySelectorAll("#opcoes-" + id + " button");
+  botoes.forEach(b => {
+    b.disabled = true;
+    const txt = b.textContent.trim();
+    if (txt === correta) {
+      b.style.background = "#D1FAE5";
+      b.style.borderColor = "#059669";
+      b.style.color = "#065f46";
+    } else if (txt === escolha && escolha !== correta) {
+      b.style.background = "#FEE2E2";
+      b.style.borderColor = "#dc2626";
+      b.style.color = "#991b1b";
+    }
+  });
+
+  const fb = document.getElementById("feedback-" + id);
+  fb.style.display = "block";
+  if (escolha === correta) {
+    fb.style.background = "#D1FAE5";
+    fb.style.color = "#065f46";
+    fb.innerHTML = "&#127881; " + feedback;
+    setTimeout(() => {
+      document.getElementById("form-" + id).style.display = "block";
+    }, 800);
+  } else {
+    fb.style.background = "#FEE2E2";
+    fb.style.color = "#991b1b";
+    fb.innerHTML = "&#10060; Ops! A resposta certa e: <strong>" + correta + "</strong>. " + feedback;
+    setTimeout(() => {
+      document.getElementById("form-" + id).style.display = "block";
+    }, 1500);
+  }
+}
+
+// ── COMPLETAR ───────────────────────────────────────────
+function responderCompletar(id, escolha, correta, feedback) {
+  const botoes = document.querySelectorAll("[onclick*='responderCompletar(" + id + "']");
+  botoes.forEach(b => {
+    b.disabled = true;
+    const txt = b.textContent.trim();
+    if (txt === correta) {
+      b.style.background = "#D1FAE5";
+      b.style.borderColor = "#059669";
+    } else if (txt === escolha && escolha !== correta) {
+      b.style.background = "#FEE2E2";
+      b.style.borderColor = "#dc2626";
+    }
+  });
+
+  const fb = document.getElementById("feedback-completar-" + id);
+  fb.style.display = "block";
+  if (escolha === correta) {
+    fb.style.background = "#D1FAE5";
+    fb.style.color = "#065f46";
+    fb.innerHTML = "&#127881; " + feedback;
+  } else {
+    fb.style.background = "#FEE2E2";
+    fb.style.color = "#991b1b";
+    fb.innerHTML = "&#10060; Quase! A resposta e: <strong>" + correta + "</strong>. " + feedback;
+  }
+  setTimeout(() => {
+    document.getElementById("form-completar-" + id).style.display = "block";
+  }, 1000);
+}
+
+// ── LIGAR ───────────────────────────────────────────────
+let letraSelecionada = {};
+const paresCertos = {};
+
+function selecionarLetro(letra, id) {
+  letraSelecionada[id] = letra;
+  // Destaca a letra selecionada
+  document.querySelectorAll("[id^='letra-" + id + "-']").forEach(el => {
+    el.style.borderColor = "#FDE68A";
+    el.style.background = "#fff";
+  });
+  const el = document.getElementById("letra-" + id + "-" + letra);
+  if (el) { el.style.borderColor = "#d97706"; el.style.background = "#FFFBEB"; }
+}
+
+function selecionarFigura(figura, letraCorreta, id) {
+  if (!letraSelecionada[id]) {
+    const fb = document.getElementById("feedback-ligar-" + id);
+    fb.style.display = "block";
+    fb.style.background = "#FEF3C7";
+    fb.style.color = "#92400e";
+    fb.innerHTML = "&#128073; Primeiro clique em uma letra!";
+    return;
+  }
+  const letra = letraSelecionada[id];
+  const figEl  = document.getElementById("figura-" + id + "-" + figura);
+  const letEl  = document.getElementById("letra-" + id + "-" + letra);
+
+  if (letra === letraCorreta) {
+    // Certo
+    if (figEl) { figEl.style.background = "#D1FAE5"; figEl.style.borderColor = "#059669"; figEl.style.pointerEvents = "none"; }
+    if (letEl) { letEl.style.background = "#D1FAE5"; letEl.style.borderColor = "#059669"; letEl.style.pointerEvents = "none"; }
+    paresCertos[id] = (paresCertos[id] || 0) + 1;
+    const total = document.querySelectorAll("[id^='letra-" + id + "-']").length;
+    if (paresCertos[id] >= total) {
+      const fb = document.getElementById("feedback-ligar-" + id);
+      fb.style.display = "block";
+      fb.style.background = "#D1FAE5";
+      fb.style.color = "#065f46";
+      fb.innerHTML = "&#127881; Perfeito! Voce ligou todos corretamente!";
+      document.getElementById("form-ligar-" + id).style.display = "block";
+    }
+  } else {
+    // Errado
+    if (figEl) { setTimeout(() => { figEl.style.background = "#FEE2E2"; figEl.style.borderColor = "#dc2626"; setTimeout(() => { figEl.style.background = "#fff"; figEl.style.borderColor = "#FDE68A"; }, 800); }, 0); }
+    const fb = document.getElementById("feedback-ligar-" + id);
+    fb.style.display = "block";
+    fb.style.background = "#FEF3C7";
+    fb.style.color = "#92400e";
+    fb.innerHTML = "&#128073; " + letra + " nao combina com " + figura + ". Tente novamente!";
+  }
+  letraSelecionada[id] = null;
+}
+</script>
+{% endblock %}
