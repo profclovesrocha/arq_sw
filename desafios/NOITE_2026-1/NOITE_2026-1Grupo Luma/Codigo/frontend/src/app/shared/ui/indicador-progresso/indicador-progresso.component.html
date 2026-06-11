@@ -1,0 +1,24 @@
+<div class="flex flex-wrap gap-3">
+  <!-- Estrelas -->
+  <div class="flex items-center gap-2 px-4 py-2 bg-[#FEF3C7] rounded-full">
+    <span class="text-xl" aria-hidden="true">⭐</span>
+    <span class="font-bold text-[var(--color-text-primary)] text-lg">{{ _estrelas() }}</span>
+    <span class="text-sm text-[var(--color-text-secondary)]">estrelas</span>
+  </div>
+
+  <!-- Conquistas -->
+  <div class="flex items-center gap-2 px-4 py-2 bg-[#EDE9FE] rounded-full">
+    <span class="text-xl" aria-hidden="true">🏆</span>
+    <span class="font-bold text-[var(--color-text-primary)] text-lg">{{ _conquistas() }}</span>
+    <span class="text-sm text-[var(--color-text-secondary)]">conquistas</span>
+  </div>
+
+  <!-- Níveis -->
+  <div class="flex items-center gap-2 px-4 py-2 bg-[#DCFCE7] rounded-full">
+    <span class="text-xl" aria-hidden="true">📊</span>
+    <span class="font-bold text-[var(--color-text-primary)] text-lg">
+      {{ _niveis() }}/{{ totalNiveis() }}
+    </span>
+    <span class="text-sm text-[var(--color-text-secondary)]">níveis</span>
+  </div>
+</div>

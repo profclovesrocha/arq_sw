@@ -1,0 +1,10 @@
+<div class="min-h-screen bg-[var(--color-background)]">
+  <app-header
+    [tipoUsuario]="tipoUsuario()"
+    [idUsuario]="idUsuario()"
+    (sair)="onSair()"
+  />
+  <main class="px-6 lg:px-12 py-6">
+    <ng-content />
+  </main>
+</div>

@@ -1,0 +1,32 @@
+<app-shell>
+  <div class="flex flex-col gap-6">
+
+    <!-- Banner motivacional -->
+    <app-banner-motivacional />
+
+    <!-- Indicadores de progresso -->
+    <app-indicador-progresso
+      [totalEstrelas]="progressoService.totalEstrelas()"
+      [totalConquistas]="progressoService.totalConquistas()"
+      [niveisCompletos]="progressoService.niveisCompletos()"
+    />
+
+    <!-- Título da seção -->
+    <h1 class="text-[2rem] font-extrabold text-[var(--color-text-primary)]">
+      Suas Atividades
+    </h1>
+
+    <!-- Grade de categorias: 1 coluna (tablet) / 2 colunas (desktop) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8">
+      @for (categoria of categorias(); track categoria.id) {
+        <app-card-categoria
+          [categoria]="categoria"
+          [niveisProgresso]="niveisDeCategoria(categoria.id)"
+          [proximoNivelId]="proximoNivelIdParaCategoria(categoria.id)"
+          (jogar)="onJogar($event)"
+        />
+      }
+    </div>
+
+  </div>
+</app-shell>

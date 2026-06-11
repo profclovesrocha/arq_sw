@@ -1,0 +1,72 @@
+<div class="min-h-screen bg-[var(--color-background)]">
+  <app-shell>
+
+    <h1 class="text-2xl font-extrabold text-[var(--color-text-primary)] mb-6">Alunos</h1>
+
+    @if (alunos.length === 0) {
+      <p class="text-[var(--color-text-secondary)] text-center py-12">
+        Nenhum aluno cadastrado ainda.
+      </p>
+    } @else {
+
+      <!-- Tabela — desktop (≥ 1024px) -->
+      <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full bg-white rounded-[var(--rounded-xl)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">
+          <thead>
+            <tr class="bg-[var(--color-background)] text-[var(--color-text-muted)] text-sm font-semibold text-left">
+              <th class="px-5 py-3">Nome / Matrícula</th>
+              <th class="px-5 py-3 text-center">⭐ Estrelas</th>
+              <th class="px-5 py-3 text-center">🏆 Conquistas</th>
+              <th class="px-5 py-3 text-center">Níveis</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (aluno of alunos; track aluno.id) {
+              <tr
+                (click)="onVerDetalhe(aluno.id)"
+                class="border-t border-[var(--color-border)] hover:bg-[var(--color-background)] cursor-pointer transition-colors"
+              >
+                <td class="px-5 py-4">
+                  <p class="font-semibold text-[var(--color-text-primary)]">{{ aluno.nome }}</p>
+                  <p class="text-xs text-[var(--color-text-muted)]">{{ aluno.matricula }}</p>
+                </td>
+                <td class="px-5 py-4 text-center font-semibold">{{ aluno.estrelas }}</td>
+                <td class="px-5 py-4 text-center font-semibold">{{ aluno.conquistas }}</td>
+                <td class="px-5 py-4 text-center">{{ aluno.niveis_completos }}/12</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cards — tablet (< 1024px) -->
+      <div class="flex flex-col gap-4 lg:hidden">
+        @for (aluno of alunos; track aluno.id) {
+          <div
+            (click)="onVerDetalhe(aluno.id)"
+            class="bg-white rounded-[var(--rounded-xl)] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] cursor-pointer hover:shadow-md transition-shadow"
+          >
+            <p class="font-bold text-[var(--color-text-primary)]">{{ aluno.nome }}</p>
+            <p class="text-xs text-[var(--color-text-muted)] mb-3">{{ aluno.matricula }}</p>
+            <div class="grid grid-cols-3 gap-2 text-sm">
+              <div class="text-center">
+                <p class="font-semibold text-[var(--color-text-primary)]">{{ aluno.estrelas }}</p>
+                <p class="text-xs text-[var(--color-text-muted)]">⭐ Estrelas</p>
+              </div>
+              <div class="text-center">
+                <p class="font-semibold text-[var(--color-text-primary)]">{{ aluno.conquistas }}</p>
+                <p class="text-xs text-[var(--color-text-muted)]">🏆 Conquistas</p>
+              </div>
+              <div class="text-center">
+                <p class="font-semibold text-[var(--color-text-primary)]">{{ aluno.niveis_completos }}/12</p>
+                <p class="text-xs text-[var(--color-text-muted)]">Níveis</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+    }
+
+  </app-shell>
+</div>

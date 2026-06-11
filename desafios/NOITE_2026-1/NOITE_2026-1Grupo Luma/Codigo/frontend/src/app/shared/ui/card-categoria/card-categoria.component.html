@@ -1,0 +1,30 @@
+<div
+  class="bg-white rounded-[var(--rounded-xl)] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all border-l-[4px] hover:border-l-[6px]"
+  [style.border-left-color]="categoria().corAccent"
+>
+  <!-- Header da categoria -->
+  <div class="flex items-center gap-3 mb-4">
+    <span class="text-2xl font-bold" [style.color]="categoria().corAccent">
+      {{ categoria().icone }}
+    </span>
+    <div>
+      <h2 class="text-xl font-bold text-[var(--color-text-primary)]">{{ categoria().nome }}</h2>
+      <p class="text-sm text-[var(--color-text-secondary)]">{{ categoria().descricao }}</p>
+    </div>
+  </div>
+
+  <!-- Lista de níveis -->
+  <div class="flex flex-col gap-3">
+    @for (nivelId of nivelIds; track nivelId) {
+      <app-card-nivel
+        [estado]="estadoDeNivel(nivelId)"
+        [nivelId]="nivelId"
+        [categoriaId]="categoria().id"
+        [corPastel]="categoria().corPastel"
+        [estrelas]="estrelasDeNivel(nivelId)"
+        [pulsando]="isPulsando(nivelId)"
+        (jogar)="onJogar($event)"
+      />
+    }
+  </div>
+</div>

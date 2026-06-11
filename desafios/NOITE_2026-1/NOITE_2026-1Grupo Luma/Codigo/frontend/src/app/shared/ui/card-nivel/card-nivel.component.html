@@ -1,0 +1,47 @@
+<div
+  class="flex items-center justify-between p-3 rounded-[var(--rounded-lg)] transition-all"
+  [style.background-color]="estado() === 'bloqueado' ? '#F9FAFB' : corPastel()"
+  [class.opacity-60]="estado() === 'bloqueado'"
+  [class.animate-shake]="shaking()"
+  [class.animate-pulse-slow]="pulsando()"
+>
+  <div class="flex flex-col gap-1">
+    <span class="font-bold text-[var(--color-text-primary)] text-base">{{ nomeNivel() }}</span>
+
+    @if (estado() === 'concluido') {
+      <div class="flex gap-0.5">
+        @for (i of estrelasArray; track i) {
+          <span [class]="i <= estrelas() ? 'text-[var(--color-star-gold)]' : 'text-[var(--color-disabled)]'">⭐</span>
+        }
+      </div>
+    }
+  </div>
+
+  @if (estado() === 'disponivel') {
+    <button
+      (click)="onJogar()"
+      class="min-h-[48px] px-4 rounded-[var(--rounded-xl)] bg-[var(--color-imip-green)] text-white font-bold text-sm hover:bg-[var(--color-imip-green-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] active:scale-95 transition-all"
+    >
+      ▶ Jogar
+    </button>
+  }
+
+  @if (estado() === 'concluido') {
+    <button
+      (click)="onJogar()"
+      class="min-h-[48px] px-4 rounded-[var(--rounded-xl)] border-2 border-[var(--color-imip-green)] text-[var(--color-imip-green)] font-bold text-sm hover:bg-[var(--color-imip-green)] hover:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-imip-green)] active:scale-95 transition-all"
+    >
+      Revisar
+    </button>
+  }
+
+  @if (estado() === 'bloqueado') {
+    <button
+      (click)="onClickBloqueado()"
+      class="min-h-[48px] px-4 rounded-[var(--rounded-xl)] bg-[var(--color-disabled)] text-[var(--color-text-muted)] font-bold text-sm cursor-not-allowed focus:outline-none"
+      aria-label="Nível bloqueado — complete o nível anterior"
+    >
+      🔒 Bloqueado
+    </button>
+  }
+</div>

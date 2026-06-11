@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from models import db, bcrypt
-from models import User
+from database import db, bcrypt
+from models.models import User, Post
 
 auth_bp = Blueprint('auth', __name__)
 

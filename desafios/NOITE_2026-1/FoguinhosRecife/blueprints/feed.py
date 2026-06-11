@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from database import db
-from models import Post
+from models.models import User, Post
 
 feed_bp = Blueprint('feed', __name__)
 

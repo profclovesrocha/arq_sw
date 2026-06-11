@@ -1,0 +1,23 @@
+<div class="flex flex-col gap-3">
+  <p class="text-lg font-bold text-[var(--color-text-primary)] mb-2">
+    {{ pergunta().enunciado }}
+  </p>
+
+  @for (opcao of pergunta().opcoes; track $index) {
+    <button
+      [class]="classeOpcao($index)"
+      [disabled]="isDesabilitada($index)"
+      (click)="onSelecionarOpcao($index)"
+      [attr.aria-label]="opcao"
+    >
+      <span class="flex items-center gap-3">
+        @if (estadosOpcoes()[$index] === 'correto') {
+          <span class="text-xl" aria-hidden="true">✓</span>
+        } @else if (estadosOpcoes()[$index] === 'incorreto' || estadosOpcoes()[$index] === 'desabilitado') {
+          <span class="text-xl" aria-hidden="true">✗</span>
+        }
+        {{ opcao }}
+      </span>
+    </button>
+  }
+</div>

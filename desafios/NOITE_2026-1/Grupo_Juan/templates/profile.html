@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Perfil — Ravix{% endblock %}
+{% block extra_css %}
+<style>
+  .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 28px; }
+  .profile-card { background: white; border-radius: 20px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; text-align: center; }
+  .big-avatar {
+    width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 900; color: white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .profile-name { font-size: 1.3rem; font-weight: 900; color: #1e293b; margin-bottom: 4px; }
+  .profile-role { font-size: 0.85rem; color: #64748b; font-weight: 700; margin-bottom: 20px; }
+  .profile-detail { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; text-align: left; }
+  .profile-detail:last-child { border-bottom: none; }
+  .pd-icon { width: 32px; height: 32px; border-radius: 8px; background: #eff6ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+  .pd-label { font-size: 0.75rem; color: #9ca3af; font-weight: 700; }
+  .pd-value { font-size: 0.88rem; font-weight: 700; color: #374151; }
+  .info-card { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.07); border: 1px solid #e2e8f0; margin-bottom: 20px; }
+  .info-title { font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .class-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+  .class-row:last-child { border-bottom: none; }
+  .class-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .class-name { font-weight: 800; font-size: 0.9rem; color: #374151; }
+  .class-meta { font-size: 0.78rem; color: #94a3b8; font-weight: 600; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Meu Perfil</div>
+      <div class="page-subtitle">Suas informações no Ravix</div>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Dashboard</a>
+  </div>
+
+  <div class="profile-grid">
+    <div>
+      <div class="profile-card">
+        <div class="big-avatar" style="background:{{ current_user.avatar_color }}">
+          {{ current_user.name[0].upper() }}
+        </div>
+        <div class="profile-name">{{ current_user.name }}</div>
+        <div class="profile-role">
+          <span class="badge {{ 'badge-teacher' if current_user.role == 'teacher' else 'badge-student' }}">
+            {{ '👩‍🏫 Professor(a)' if current_user.role == 'teacher' else '🎒 Aluno(a)' }}
+          </span>
+        </div>
+
+        <div>
+          <div class="profile-detail">
+            <div class="pd-icon"><i class="fas fa-envelope"></i></div>
+            <div>
+              <div class="pd-label">E-mail</div>
+              <div class="pd-value">{{ current_user.email }}</div>
+            </div>
+          </div>
+          {% if current_user.hospital %}
+          <div class="profile-detail">
+            <div class="pd-icon"><i class="fas fa-hospital"></i></div>
+            <div>
+              <div class="pd-label">Hospital</div>
+              <div class="pd-value">{{ current_user.hospital }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if current_user.ward %}
+          <div class="profile-detail">
+            <div class="pd-icon"><i class="fas fa-bed"></i></div>
+            <div>
+              <div class="pd-label">Ala / Enfermaria</div>
+              <div class="pd-value">{{ current_user.ward }}</div>
+            </div>
+          </div>
+          {% endif %}
+          {% if current_user.age %}
+          <div class="profile-detail">
+            <div class="pd-icon"><i class="fas fa-birthday-cake"></i></div>
+            <div>
+              <div class="pd-label">Idade</div>
+              <div class="pd-value">{{ current_user.age }} anos</div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="profile-detail">
+            <div class="pd-icon"><i class="fas fa-calendar"></i></div>
+            <div>
+              <div class="pd-label">Membro desde</div>
+              <div class="pd-value">{{ current_user.created_at.strftime('%d/%m/%Y') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      {% if current_user.role == 'teacher' %}
+      <div class="info-card">
+        <div class="info-title" style="color:#e74c8b">
+          <i class="fas fa-chart-bar"></i> Resumo como Professor(a)
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:14px; margin-bottom:24px;">
+          <div style="text-align:center; background:#eff6ff; border-radius:14px; padding:16px;">
+            <div style="font-size:2rem; font-weight:900; color:var(--primary)">{{ classrooms|length }}</div>
+            <div style="font-size:0.78rem; font-weight:700; color:#64748b">Turmas</div>
+          </div>
+          <div style="text-align:center; background:#fdf4ff; border-radius:14px; padding:16px;">
+            <div style="font-size:2rem; font-weight:900; color:#a855f7">{{ total_students }}</div>
+            <div style="font-size:0.78rem; font-weight:700; color:#64748b">Alunos</div>
+          </div>
+          <div style="text-align:center; background:#fff7ed; border-radius:14px; padding:16px;">
+            <div style="font-size:2rem; font-weight:900; color:#f59e0b">{{ total_posts }}</div>
+            <div style="font-size:0.78rem; font-weight:700; color:#64748b">Publicações</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="info-card">
+        <div class="info-title">
+          <i class="fas fa-chalkboard" style="color:var(--primary)"></i>
+          Minhas Turmas ({{ classrooms|length }})
+        </div>
+        {% for c in classrooms %}
+        <a href="{{ url_for('classroom_view', cid=c.id) }}" style="text-decoration:none; display:block">
+          <div class="class-row">
+            <div class="class-dot" style="background:{{ c.color }}; width:14px; height:14px; border-radius:4px;"></div>
+            <div style="flex:1">
+              <div class="class-name">{{ c.name }}</div>
+              <div class="class-meta">
+                {{ c.subject or 'Sem disciplina' }} •
+                {{ c.enrollments|length }} aluno(s) •
+                {{ c.posts|length }} publicação(ões)
+              </div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#d1d5db; font-size:0.75rem;"></i>
+          </div>
+        </a>
+        {% else %}
+        <div style="text-align:center; padding:24px; color:#94a3b8; font-size:0.85rem; font-weight:600;">
+          Nenhuma turma ainda
+        </div>
+        {% endfor %}
+      </div>
+
+      <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 16px; padding: 24px; border: 1px solid #bfdbfe;">
+        <div style="font-size:1.5rem; margin-bottom:8px;">💙</div>
+        <div style="font-weight:800; color:#1e40af; margin-bottom:6px;">
+          {{ 'Você faz a diferença!' if current_user.role == 'teacher' else 'Continue firme!' }}
+        </div>
+        <div style="font-size:0.85rem; color:#3b82f6; font-weight:600; line-height:1.6">
+          {% if current_user.role == 'teacher' %}
+            Professores como você garantem que nenhum aluno fique para trás, independente da situação de saúde. Obrigado pelo seu trabalho! 🌟
+          {% else %}
+            Sua dedicação aos estudos mesmo durante esse momento difícil é inspiradora. Continue aprendendo! 🌟
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
