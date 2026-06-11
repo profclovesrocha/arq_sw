@@ -1,14 +1,17 @@
 ## TURMA NOITE 2026-1
 
 GRUPO:
-* Cauã Andrade
-* Diogenes Raimundo
-* Giovanna Melo
-* Laura Marques
-* Maria Eduarda Cavalcante
-* Tereza Ana Barros
+* Cauã Andrade do Nascimento - 01821096
+* Diogenes Raimundo Da Silva - 01777145
+* Giovanna Cavalcanti Melo - 01828278
+* Maria Eduarda Cavalcante Hora - 01603709
+* Laura Marques de Arandas - 01850581
+* Tereza Ana Barros e Silva - 01830940
 ---
-# Documentação: Plataforma Eve 
+# Documentação: Foguinhos de Recife
+
+## Link da apresentação:
+https://drive.google.com/file/d/1uqMTAKIOLg-UPlxDLFgUX4UQvm6rQi0O/view?usp=sharing
 
 ## RESUMO 
 Este documento apresenta o protótipo para o projeto de Arquitetura de Software, focado na análise da defasagem da socialização, sincretismo cultural e vida noturna na cidade do Recife. A proposta utiliza princípios de *Smart City* para estimular interações interpessoais e culturais na região.
